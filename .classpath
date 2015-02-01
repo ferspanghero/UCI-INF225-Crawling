@@ -2,5 +2,22 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/apache-mime4j-core-0.7.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/apache-mime4j-dom-0.7.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/asm-3.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/boilerpipe-1.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/commons-codec-1.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/commons-compress-1.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/geronimo-stax-api_1.0_spec-1.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/httpclient-4.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/httpcore-4.2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/je-4.0.92.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/metadata-extractor-2.4.0-beta-1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/tagsoup-1.2.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/tika-core-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/tika-parsers-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Roeland/Desktop/crawler/crawler4j-3.5/crawler4j-3.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
