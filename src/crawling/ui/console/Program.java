@@ -1,4 +1,4 @@
-package ui.console;
+package crawling.ui.console;
 
 public class Program {
 
