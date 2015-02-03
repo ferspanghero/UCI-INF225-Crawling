@@ -10,13 +10,11 @@ import edu.uci.ics.crawler4j.url.*;
  * Represents a crawler that visits and collects information about web pages
  */
 public class Crawler extends WebCrawler {
-	public Crawler(IPagesRepository repository, IPageTextParser parser) {
+	public Crawler(IPagesRepository repository) {
 		_repository = repository;
-		_parser = parser;
 	}
 
 	private IPagesRepository _repository;
-	private IPageTextParser _parser;
 
 	private final static Pattern FILTERS = Pattern
 			.compile(".*(\\.(css|js|bmp|gif|jpe?g"
