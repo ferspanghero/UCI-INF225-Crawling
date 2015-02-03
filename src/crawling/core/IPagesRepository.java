@@ -1,5 +1,7 @@
 package crawling.core;
 
+import java.util.List;
+
 import edu.uci.ics.crawler4j.crawler.Page;
 
 /**
@@ -7,16 +9,27 @@ import edu.uci.ics.crawler4j.crawler.Page;
  */
 public interface IPagesRepository {
 	/**
+	 * Sets the repository to read pages from the beginning
+	 */
+	void reset();
+
+	/**
 	 * Parses and inserts a page into the pages repository
 	 */
-	void insertPage(Page page, IPageTextParser parser);
+	void insertPage(Page page);
+
+	/**
+	 * Retrieves the next page that can be sequentially iterated from the pages
+	 * repository
+	 */
+	List<PageProcessingData> retrieveNextPages();
 
 	/**
 	 * Retrieves the next page that can be sequentially iterated from the pages
 	 * repository
 	 * 
-	 * @param reset
-	 *            Determines if the iteration should be reseted
+	 * @param pagesChunkSize
+	 *            Determines the number of pages that should be retrieved
 	 */
-	Page retrieveNextPage(Boolean reset);
+	List<PageProcessingData> retrieveNextPages(int pagesChunkSize);
 }

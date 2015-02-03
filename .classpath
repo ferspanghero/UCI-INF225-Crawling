@@ -19,5 +19,7 @@
 	<classpathentry kind="lib" path="C:/Users/ferspanghero/Desktop/eclipse/workspace/Crawling/lib/tagsoup-1.2.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/ferspanghero/Desktop/eclipse/workspace/Crawling/lib/tika-core-1.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/ferspanghero/Desktop/eclipse/workspace/Crawling/lib/tika-parsers-1.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="C:/Users/ferspanghero/Desktop/eclipse/workspace/Crawling/lib/mockito-core-2.0.3-beta.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
