@@ -4,12 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.junit.Before;
@@ -25,7 +23,6 @@ public class DefaultPagesProcessorTest {
 	private IPagesRepository repository;
 	private PagesProcessorConfiguration config;
 	private final int SAMPLE_PAGES_COUNT = 5;
-	private final String LARGEST_TEXT = "Largest sample text";
 	private final int MOST_COMMON_COUNT = 2;
 
 	@Before
@@ -34,7 +31,7 @@ public class DefaultPagesProcessorTest {
 		repository = mock(IPagesRepository.class);
 		config = new PagesProcessorConfiguration(null, 2);
 
-		when(repository.retrieveNextPages(anyInt())).thenReturn(getTestPageProcessingData());
+		when(repository.retrieveNextPages(anyInt())).thenReturn(getTestPageProcessingData(), null);
 	}
 
 	private List<PageProcessingData> getTestPageProcessingData() {
@@ -44,7 +41,7 @@ public class DefaultPagesProcessorTest {
 			pages.add(new PageProcessingData("www.testurl" + i + ".com", "A sample text" + i));
 		}
 
-		pages.add(new PageProcessingData("www.testurl" + SAMPLE_PAGES_COUNT + ".com", LARGEST_TEXT));
+		pages.add(new PageProcessingData("www.testurl" + SAMPLE_PAGES_COUNT + ".com", "Largest sample text"));
 
 		return pages;
 	}
@@ -77,7 +74,7 @@ public class DefaultPagesProcessorTest {
 		longestPage = processor.getLongestPage();
 
 		// Assert
-		assertEquals(longestPage, LARGEST_TEXT);
+		assertEquals(longestPage, "www.testurl" + SAMPLE_PAGES_COUNT + ".com");
 	}
 
 	@Test

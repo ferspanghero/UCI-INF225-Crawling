@@ -1,5 +1,6 @@
 package crawling.core;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -8,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -47,8 +47,6 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 
 		while (pages != null && pages.size() > 0) {
 			// Computes pages count
-			// TODO: Make sure that duplications will be treated in the
-			// repository level
 			processUniquePagesCount(pages);
 
 			// Computes most common elements
@@ -83,13 +81,13 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 	@Override
 	public Map<String, Integer> getMostCommonWords(int count) {
 		// Makes sure an unmodifiable result is returned
-		return Collections.unmodifiableMap(getMapFirstEntries(sortMapByValue(mostCommonWords), count));
+		return Collections.unmodifiableMap(getMapFirstEntries(sortMapByValueDescending(mostCommonWords), count));
 	}
 
 	@Override
 	public Map<String, Integer> getMostCommonNGrams(int count) {
 		// Makes sure an unmodifiable result is returned
-		return Collections.unmodifiableMap(getMapFirstEntries(sortMapByValue(mostCommonNGrams), count));
+		return Collections.unmodifiableMap(getMapFirstEntries(sortMapByValueDescending(mostCommonNGrams), count));
 	}
 
 	private void processUniquePagesCount(List<PageProcessingData> pages) {
@@ -112,14 +110,22 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 
 					// If it reads the last character of the page and it is
 					// alphanumerical, then we have a word
-					if (i == textLength - 1)
-						computeWord(config, page, wordStartIndex, nGramWordsQueue, i);
+					// OBS: It is necessary to increment the current index + 1
+					// to allow the substring method to consider the last
+					// character
+					if (i == textLength - 1) {
+						computeWord(config, page, wordStartIndex, nGramWordsQueue, i + 1);
+
+						wordStartIndex = -1;
+					}
 				}
 
 				// If it hits a non-alphanumerical character and there is a
 				// word's first letter index detected, then we have a word
 				else if (wordStartIndex >= 0) {
 					computeWord(config, page, wordStartIndex, nGramWordsQueue, i);
+
+					wordStartIndex = -1;
 				}
 			}
 		}
@@ -127,10 +133,10 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 
 	private void computeWord(PagesProcessorConfiguration config, PageProcessingData page, int wordStartIndex, Queue<String> nGramWordsQueue, int i) {
 		// Extract the word from the text and converts it to lower case
-		String word = page.getText().substring(wordStartIndex, i - 1).toLowerCase();
+		String word = page.getText().substring(wordStartIndex, i).toLowerCase();
 
 		// Only considers non stop words
-		if (!config.getStopWords().contains(word)) {
+		if (config.getStopWords() == null || !config.getStopWords().contains(word)) {
 			// Computes word frequency
 			addToMap(mostCommonWords, word);
 
@@ -147,8 +153,6 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 				nGramWordsQueue.remove();
 			}
 		}
-
-		wordStartIndex = -1;
 	}
 
 	private void addToMap(Map<String, Integer> map, String key) {
@@ -169,20 +173,28 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		return longestPageLength;
 	}
 
-	private <K, V extends Comparable<? super V>> Map<K, V> sortMapByValue(Map<K, V> map) {
-		Map<K, V> result = new LinkedHashMap<>();
-		Stream<Entry<K, V>> st = map.entrySet().stream();
+	private <K, V extends Comparable<? super V>> Map<K, V> sortMapByValueDescending(Map<K, V> map) {
+		List<Entry<K, V>> sortedEntries = new ArrayList<Entry<K, V>>(map.entrySet());
+		Map<K, V> sortedMap = new LinkedHashMap<K, V>();
 
-		st.sorted(Comparator.comparing(e -> e.getValue())).forEach(e -> result.put(e.getKey(), e.getValue()));
+		Collections.sort(sortedEntries, new Comparator<Entry<K, V>>() {
+			@Override
+			public int compare(Entry<K, V> e1, Entry<K, V> e2) {
+				return e2.getValue().compareTo(e1.getValue());
+			}
+		});
 
-		return result;
+		sortedEntries.forEach(e -> sortedMap.put(e.getKey(), e.getValue()));
+
+		return sortedMap;
 	}
 
 	private <K, V> Map<K, V> getMapFirstEntries(Map<K, V> map, int elementsToReturn) {
-		return map
-				.entrySet()
-				.stream()
-				.limit(elementsToReturn)
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1, HashMap::new));
+		List<Entry<K, V>> entries = new ArrayList<Entry<K, V>>(map.entrySet());
+		Map<K, V> reducedMap = new LinkedHashMap<K, V>();
+
+		entries.stream().limit(elementsToReturn).forEach(e -> reducedMap.put(e.getKey(), e.getValue()));
+
+		return reducedMap;
 	}
 }
