@@ -20,6 +20,10 @@
 	<classpathentry kind="lib" path="C:/Users/ferspanghero/Desktop/eclipse/workspace/Crawling/lib/tika-core-1.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/ferspanghero/Desktop/eclipse/workspace/Crawling/lib/tika-parsers-1.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="C:/Users/ferspanghero/Desktop/eclipse/workspace/Crawling/lib/mockito-all-1.10.19.jar"/>
+=======
+	<classpathentry kind="lib" path="C:/Users/ferspanghero/Desktop/eclipse/workspace/Crawling/lib/mockito-core-2.0.3-beta.jar"/>
+>>>>>>> branch 'master' of https://github.com/ferspanghero/UCI-INF225-Crawling.git
 	<classpathentry kind="output" path="bin"/>
 </classpath>
