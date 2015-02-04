@@ -7,7 +7,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Map.Entry;
 
 import org.junit.Before;
@@ -17,6 +19,7 @@ import crawling.core.DefaultPagesProcessor;
 import crawling.core.IPagesRepository;
 import crawling.core.PageProcessingData;
 import crawling.core.PagesProcessorConfiguration;
+import crawling.ui.console.Program;
 
 public class DefaultPagesProcessorTest {
 	private DefaultPagesProcessor processor;
@@ -29,19 +32,31 @@ public class DefaultPagesProcessorTest {
 	public final void initialize() {
 		processor = new DefaultPagesProcessor();
 		repository = mock(IPagesRepository.class);
-		config = new PagesProcessorConfiguration(null, 2);
+		config = getTestPageProcessorConfiguration();
 
 		when(repository.retrieveNextPages(anyInt())).thenReturn(getTestPageProcessingData(), null);
+	}
+
+	private PagesProcessorConfiguration getTestPageProcessorConfiguration() {
+		HashSet<String> stopWords = new HashSet<String>();
+
+		try (Scanner scanner = new Scanner(DefaultPagesProcessorTest.class.getResourceAsStream("/resources/stopwords.txt"))) {
+			while (scanner.hasNextLine()) {
+				stopWords.add(scanner.nextLine());
+			}
+		}
+
+		return new PagesProcessorConfiguration(stopWords, 2);
 	}
 
 	private List<PageProcessingData> getTestPageProcessingData() {
 		ArrayList<PageProcessingData> pages = new ArrayList<PageProcessingData>();
 
 		for (int i = 1; i <= SAMPLE_PAGES_COUNT - 1; i++) {
-			pages.add(new PageProcessingData("www.testurl" + i + ".com", "A sample text" + i));
+			pages.add(new PageProcessingData("www.testurl" + i + ".com", "A cool sample text" + i));
 		}
 
-		pages.add(new PageProcessingData("www.testurl" + SAMPLE_PAGES_COUNT + ".com", "Largest sample text"));
+		pages.add(new PageProcessingData("www.testurl" + SAMPLE_PAGES_COUNT + ".com", "Largest sample text ever"));
 
 		return pages;
 	}
@@ -90,7 +105,7 @@ public class DefaultPagesProcessorTest {
 		assertEquals(mostCommonWords.length, MOST_COMMON_COUNT);
 		assertEquals(mostCommonWords[0].getKey(), "sample");
 		assertEquals(mostCommonWords[0].getValue(), new Integer(SAMPLE_PAGES_COUNT));
-		assertEquals(mostCommonWords[1].getKey(), "a");
+		assertEquals(mostCommonWords[1].getKey(), "cool");
 		assertEquals(mostCommonWords[1].getValue(), new Integer(SAMPLE_PAGES_COUNT - 1));
 	}
 
@@ -104,7 +119,7 @@ public class DefaultPagesProcessorTest {
 
 		// Assert
 		assertEquals(mostCommonNGrams.length, MOST_COMMON_COUNT);
-		assertEquals(mostCommonNGrams[0].getKey(), "a sample");
+		assertEquals(mostCommonNGrams[0].getKey(), "cool sample");
 		assertEquals(mostCommonNGrams[0].getValue(), new Integer(SAMPLE_PAGES_COUNT - 1));
 	}
 

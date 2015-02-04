@@ -20,7 +20,6 @@ public class MySqlPagesRepository implements IPagesRepository {
 
 	@Override
 	public List<PageProcessingData> retrieveNextPages() {
-		// TODO: Use java.util.Collections.unmodifiableList(...)
 		return null;
 	}
 
