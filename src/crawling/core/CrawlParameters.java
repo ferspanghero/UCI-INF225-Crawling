@@ -1,7 +1,6 @@
 package crawling.core;
 
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
-import edu.uci.ics.crawler4j.crawler.WebCrawler;
 
 /**
  * Represents a set of parameters that configure the web pages crawling

@@ -16,16 +16,21 @@ import edu.uci.ics.crawler4j.url.WebURL;
  * Represents a crawler that visits and collects information about web pages
  */
 public class Crawler extends WebCrawler {
-	/*
-	 * public Crawler(IPagesRepository repository, IPageTextParser parser) {
-	 * _repository = repository; _parser = parser; } private IPagesRepository
-	 * _repository; private IPageTextParser _parser;
-	 */
-
 	private static int count = 0;
-
 	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|csv|data|js|bmp|gif|jpe?g" + "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf|pde" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
-
+	private IPagesRepository repository;
+	
+	@Override
+	public void onStart() { 
+		Object data = myController.getCustomData();
+		
+		if (!(data instanceof IPagesRepository)) {
+			throw new IllegalArgumentException("The web crawler must be supplied with a valid pages repository");
+		}
+		
+		repository = (IPagesRepository)data;
+	}
+	
 	/**
 	 * You should implement this function to specify whether the given url
 	 * should be crawled or not (based on your crawling logic).
@@ -43,6 +48,9 @@ public class Crawler extends WebCrawler {
 	 */
 	@Override
 	public void visit(Page page) {
+		// TODO: uncomment the line below when the repository is properly implemented
+		// repository.insertPage(page);
+		
 		String url = page.getWebURL().getURL();
 		System.out.println("URL: " + url);
 

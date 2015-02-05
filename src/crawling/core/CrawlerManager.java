@@ -11,7 +11,7 @@ import edu.uci.ics.crawler4j.crawler.WebCrawler;
  * Represents a controller that manages the pages crawler
  */
 public class CrawlerManager {
-	public void Run(CrawlParameters parameters, ICrawlControllerBuilder crawlControllerBuilder, Class<? extends WebCrawler> crawlerType) throws Exception {
+	public void Run(CrawlParameters parameters, ICrawlControllerBuilder crawlControllerBuilder, IPagesRepository repository, Class<? extends WebCrawler> crawlerType) throws Exception {
 		/*
 		 * Instantiate the controller for this crawl.
 		 */
@@ -24,11 +24,13 @@ public class CrawlerManager {
 		 */
 		controller.addSeed(parameters.getBaseDomain());
 
+		// Injects the repository into the crawler
+		controller.setCustomData(repository);
+		
 		/*
 		 * Start the crawl. This is a blocking operation, meaning that your code
 		 * will reach the line after this only when crawling is finished.
 		 */
-
 		controller.start(crawlerType, parameters.getNumberOfCrawlers());
 	}
 }
