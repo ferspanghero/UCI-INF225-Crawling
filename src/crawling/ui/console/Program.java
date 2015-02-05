@@ -1,6 +1,7 @@
 package crawling.ui.console;
 
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,7 +17,7 @@ import crawling.core.DefaultPagesProcessor;
 import crawling.core.ICrawlControllerBuilder;
 import crawling.core.IPagesProcessor;
 import crawling.core.IPagesRepository;
-import crawling.core.MySqlPagesRepository;
+import crawling.core.MySQLPagesRepository;
 import crawling.core.PagesProcessorConfiguration;
 import crawling.test.DefaultPagesProcessorTest;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
@@ -27,7 +28,7 @@ public class Program {
 		try {
 			int option;
 			final String NOT_PROCESSED_ERROR_MESSAGE = "\nPages must be processed first\n";
-			IPagesRepository repository = new MySqlPagesRepository();
+			IPagesRepository repository = new MySQLPagesRepository();
 			IPagesProcessor processor = null;
 
 			try (Scanner stdin = new Scanner(System.in)) {
@@ -130,7 +131,7 @@ public class Program {
 	}
 
 	private static void printOptions() {
-		System.out.println("(1) - Start crawling UCI's domain");
+		System.out.println("(1) - Crawl UCI's domain");
 		System.out.println("(2) - Process crawled pages data");
 		System.out.println("(3) - Display unique pages count");
 		System.out.println("(4) - Display longest page URL");
@@ -151,11 +152,10 @@ public class Program {
 		config.setUserAgentString("UCI WebCrawler 93082117/30489978/12409858");
 		config.setResumableCrawling(true);
 
-		// TODO: inject logger into the controller
 		manager.Run(new CrawlParameters(config, 10, "http://www.ics.uci.edu"), crawlControllerBuilder, repository, Crawler.class);
 	}
 
-	private static IPagesProcessor processPages(IPagesRepository repository) {
+	private static IPagesProcessor processPages(IPagesRepository repository) throws SQLException {
 		IPagesProcessor processor = new DefaultPagesProcessor();
 		HashSet<String> stopWords = new HashSet<String>();
 

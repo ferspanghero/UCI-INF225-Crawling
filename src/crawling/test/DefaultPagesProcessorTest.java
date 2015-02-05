@@ -6,6 +6,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +29,7 @@ public class DefaultPagesProcessorTest {
 	private final int MOST_COMMON_COUNT = 2;
 
 	@Before
-	public final void initialize() {
+	public final void initialize() throws SQLException {
 		processor = new DefaultPagesProcessor();
 		repository = mock(IPagesRepository.class);
 		config = getTestPageProcessorConfiguration();
@@ -52,16 +53,16 @@ public class DefaultPagesProcessorTest {
 		ArrayList<PageProcessingData> pages = new ArrayList<PageProcessingData>();
 
 		for (int i = 1; i <= SAMPLE_PAGES_COUNT - 1; i++) {
-			pages.add(new PageProcessingData("www.testurl" + i + ".com", "A cool sample text" + i));
+			pages.add(new PageProcessingData("www.testurl" + i + ".com", "A cool sample text" + i, ""));
 		}
 
-		pages.add(new PageProcessingData("www.testurl" + SAMPLE_PAGES_COUNT + ".com", "Largest sample text ever"));
+		pages.add(new PageProcessingData("www.testurl" + SAMPLE_PAGES_COUNT + ".com", "Largest sample text ever", ""));
 
 		return pages;
 	}
 
 	@Test
-	public final void testGetUniquePagesCount() {
+	public final void testGetUniquePagesCount() throws SQLException {
 		// Arrange
 		int uniquePagesCount;
 
@@ -79,7 +80,7 @@ public class DefaultPagesProcessorTest {
 	}
 
 	@Test
-	public final void testGetLongestPage() {
+	public final void testGetLongestPage() throws SQLException {
 		// Arrange
 		String longestPage;
 
@@ -92,7 +93,7 @@ public class DefaultPagesProcessorTest {
 	}
 
 	@Test
-	public final void testGetMostCommonWords() {
+	public final void testGetMostCommonWords() throws SQLException {
 		// Arrange
 		Entry<String, Integer>[] mostCommonWords = (Entry<String, Integer>[]) new Entry[MOST_COMMON_COUNT];
 
@@ -109,7 +110,7 @@ public class DefaultPagesProcessorTest {
 	}
 
 	@Test
-	public final void testGetMostCommonNGrams() {
+	public final void testGetMostCommonNGrams() throws SQLException {
 		Entry<String, Integer>[] mostCommonNGrams = (Entry<String, Integer>[]) new Entry[MOST_COMMON_COUNT];
 
 		// Act

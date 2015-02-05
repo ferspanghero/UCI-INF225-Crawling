@@ -1,8 +1,7 @@
 package crawling.core;
 
+import java.sql.SQLException;
 import java.util.List;
-
-import edu.uci.ics.crawler4j.crawler.Page;
 
 /**
  * Represents a repository that contains data about the crawled pages
@@ -15,14 +14,10 @@ public interface IPagesRepository {
 
 	/**
 	 * Parses and inserts a page into the pages repository
+	 * 
+	 * @throws SQLException
 	 */
-	void insertPage(Page page);
-
-	/**
-	 * Retrieves the next page that can be sequentially iterated from the pages
-	 * repository
-	 */
-	List<PageProcessingData> retrieveNextPages();
+	void insertPages(List<PageProcessingData> pages) throws SQLException;
 
 	/**
 	 * Retrieves the next page that can be sequentially iterated from the pages
@@ -30,6 +25,7 @@ public interface IPagesRepository {
 	 * 
 	 * @param pagesChunkSize
 	 *            Determines the number of pages that should be retrieved
+	 * @throws SQLException
 	 */
-	List<PageProcessingData> retrieveNextPages(int pagesChunkSize);
+	List<PageProcessingData> retrieveNextPages(int pagesChunkSize) throws SQLException;
 }

@@ -39,8 +39,9 @@ public class CrawlerManagerTest {
 		manager.Run(parameters, crawlControllerBuilder, repository, Crawler.class);
 		
 		// Assert
-		verify(crawlControllerBuilder).build(parameters);
+		verify(crawlControllerBuilder).build(parameters);		
 		verify(controller).addSeed(parameters.getBaseDomain());
+		verify(controller).setCustomData(repository);
 		verify(controller).start(Crawler.class, parameters.getNumberOfCrawlers());
 	}
 

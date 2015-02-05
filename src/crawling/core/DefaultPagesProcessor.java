@@ -1,5 +1,6 @@
 package crawling.core;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,7 +34,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 	private HashMap<String, Integer> mostCommonNGrams;
 
 	@Override
-	public void processPages(IPagesRepository repository, PagesProcessorConfiguration config) {
+	public void processPages(IPagesRepository repository, PagesProcessorConfiguration config) throws SQLException {
 		if (repository == null)
 			throw new IllegalArgumentException("The pages processor cannot be initialized with a null pages repository");
 

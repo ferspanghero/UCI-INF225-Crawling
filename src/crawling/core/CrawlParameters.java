@@ -32,47 +32,26 @@ public class CrawlParameters {
 		return errorMessages.toString();
 	}
 
-	/**
-	 * @return the config
-	 */
 	public CrawlConfig getConfig() {
 		return config;
 	}
 
-	/**
-	 * @param config
-	 *            the config to set
-	 */
 	public void setConfig(CrawlConfig config) {
 		this.config = config;
 	}
 
-	/**
-	 * @return the numberOfCrawlers
-	 */
 	public int getNumberOfCrawlers() {
 		return numberOfCrawlers;
 	}
 
-	/**
-	 * @param numberOfCrawlers
-	 *            the numberOfCrawlers to set
-	 */
 	public void setNumberOfCrawlers(int numberOfCrawlers) {
 		this.numberOfCrawlers = numberOfCrawlers;
 	}
 
-	/**
-	 * @return the baseDomain
-	 */
 	public String getBaseDomain() {
 		return baseDomain;
 	}
 
-	/**
-	 * @param baseDomain
-	 *            the baseDomain to set
-	 */
 	public void setBaseDomain(String baseDomain) {
 		this.baseDomain = baseDomain;
 	}	
