@@ -14,13 +14,14 @@ import edu.uci.ics.crawler4j.fetcher.*;
 public class CrawlerController {
 	public void Run() throws Exception {
 		String crawlStorageFolder = ".\\data\\crawl\\root";
-		String userAgent = "UCI WebCrawler 93082117/30489978/rahan";
-		int numberOfCrawlers = 7;
+		String userAgent = "UCI WebCrawler 93082117/30489978/12409858";
+		int numberOfCrawlers = 10;
 
 		CrawlConfig config = new CrawlConfig();
 		config.setCrawlStorageFolder(crawlStorageFolder);
-		config.setPolitenessDelay(300); // Set it to 300ms as per instructions
+		config.setPolitenessDelay(500); // Set it to 500ms as per instructions
 		config.setUserAgentString(userAgent);
+		config.setResumableCrawling(true);
 
 		/*
 		 * Not sure if below is necessary
@@ -45,7 +46,8 @@ public class CrawlerController {
 		 * which are found in these pages
 		 */
 
-		controller.addSeed("http://localhost:80/index.html");
+		controller.addSeed("http://www.ics.uci.edu");
+
 
 		/*
 		 * Start the crawl. This is a blocking operation, meaning that your code
