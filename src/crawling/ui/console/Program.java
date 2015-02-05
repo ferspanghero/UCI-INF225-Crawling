@@ -1,19 +1,28 @@
 package crawling.ui.console;
 
-import java.util.Scanner;
-
-import crawling.core.*;
+import crawling.core.CrawlParameters;
+import crawling.core.Crawler;
+import crawling.core.CrawlerManager;
+import crawling.core.DefaultCrawlControllerBuilder;
+import crawling.core.ICrawlControllerBuilder;
+import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 
 public class Program {
 
 	public static void main(String[] args) {
-		CrawlerController controller = new CrawlerController();		
-		
+		CrawlerManager manager = new CrawlerManager();
+
 		try {
+			CrawlConfig config = new CrawlConfig();
+			ICrawlControllerBuilder crawlControllerBuilder = new DefaultCrawlControllerBuilder();
+
+			config.setCrawlStorageFolder(".\\data\\crawl\\root");
+			config.setPolitenessDelay(500);
+			config.setUserAgentString("UCI WebCrawler 93082117/30489978/12409858");
+			config.setResumableCrawling(true);
+
 			// TODO: see how logger can be injected into the controller
-			// TODO: see how the Crawler can be injected into the controller (ICrawlerBuilder?)
-			// controller.Run();
-			System.out.println("Hello!");
+			manager.Run(new CrawlParameters(config, 10, "http://www.ics.uci.edu"), crawlControllerBuilder, Crawler.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

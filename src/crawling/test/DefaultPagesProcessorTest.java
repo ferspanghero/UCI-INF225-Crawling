@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Map.Entry;
+import java.util.Scanner;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,6 @@ import crawling.core.DefaultPagesProcessor;
 import crawling.core.IPagesRepository;
 import crawling.core.PageProcessingData;
 import crawling.core.PagesProcessorConfiguration;
-import crawling.ui.console.Program;
 
 public class DefaultPagesProcessorTest {
 	private DefaultPagesProcessor processor;
