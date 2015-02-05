@@ -46,8 +46,8 @@ public class CrawlerController {
 		 * which are found in these pages
 		 */
 
-		//controller.addSeed("http://www.ics.uci.edu");
-		controller.addSeed("http://archive.ics.uci.edu/ml/datasets.html");
+		controller.addSeed("http://www.ics.uci.edu");
+
 
 		/*
 		 * Start the crawl. This is a blocking operation, meaning that your code

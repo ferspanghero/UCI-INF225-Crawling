@@ -22,7 +22,7 @@ public class Crawler extends WebCrawler {
 	private static int count = 0;
 
 	private final static Pattern FILTERS = Pattern
-			.compile(".*(\\.(css|js|bmp|gif|jpe?g"
+			.compile(".*(\\.(css|csv|data|js|bmp|gif|jpe?g"
 					+ "|png|tiff?|mid|mp2|mp3|mp4"
 					+ "|wav|avi|mov|mpeg|ram|m4v|pdf|pde"
 					+ "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
@@ -36,8 +36,8 @@ public class Crawler extends WebCrawler {
 		String href = url.getURL().toLowerCase();
 		return !FILTERS.matcher(href).matches()
 				&& href.contains("ics.uci.edu")
-				&& href.startsWith("http://archive.ics.uci.edu/ml/datasets.html")
-				&& !href.startsWith("http://archive.ics.uci.edu/ml/datasets.html?")
+				&& !href.startsWith("http://archive.ics.uci.edu/ml/datasets.html")
+				&& !href.startsWith("http://archive.ics.uci.edu/ml/machine-learning-databases/")
 				&& !href.contains("calendar");
 	}
 
@@ -62,7 +62,7 @@ public class Crawler extends WebCrawler {
 			System.out.println("Link number: " + count++);
 			
 			try{
-			PrintWriter writer = new PrintWriter((new BufferedWriter(new FileWriter("myfile.txt", true))));
+			PrintWriter writer = new PrintWriter((new BufferedWriter(new FileWriter("output/myfile.txt", true))));
 			writer.println(url);
 			writer.println(text);
 			writer.println("\n");
