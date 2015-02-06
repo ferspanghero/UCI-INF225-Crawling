@@ -16,7 +16,7 @@ public class DefaultCrawlControllerBuilder implements ICrawlControllerBuilder {
 
 		String errorMessages = parameters.validate();
 
-		if (errorMessages != null && errorMessages != "")
+		if (errorMessages != null && errorMessages.length() > 1)
 			throw new IllegalArgumentException(errorMessages);
 
 		PageFetcher pageFetcher = new PageFetcher(parameters.getConfig());

@@ -150,11 +150,11 @@ public class Program {
 		config.setCrawlStorageFolder(".\\data\\crawl\\root");
 		config.setPolitenessDelay(500);
 		config.setMaxDepthOfCrawling(40);
-		config.setMaxPagesToFetch(10);
+		config.setMaxPagesToFetch(60000);
 		config.setUserAgentString("UCI WebCrawler 93082117/30489978/12409858");
 		config.setResumableCrawling(true);
 
-		manager.Run(new CrawlParameters(config, 10, "http://www.ics.uci.edu"), crawlControllerBuilder, repository, Crawler.class);
+		manager.Run(new CrawlParameters(config, 5, "http://www.ics.uci.edu"), crawlControllerBuilder, repository, Crawler.class);
 	}
 
 	private static IPagesProcessor processPages(IPagesRepository repository) throws SQLException {

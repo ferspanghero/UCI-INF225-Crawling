@@ -34,6 +34,15 @@ public class Crawler extends WebCrawler {
 		repository = (IPagesRepository) data;
 	}
 
+	@Override
+	public void onBeforeExit() {
+		if (pages.size() > 1) {
+			insertPages();
+		}
+		
+		super.onBeforeExit();
+	}
+
 	/**
 	 * You should implement this function to specify whether the given url
 	 * should be crawled or not (based on your crawling logic).
@@ -43,7 +52,6 @@ public class Crawler extends WebCrawler {
 		String href = url.getURL().toLowerCase();
 
 		return !FILTERS.matcher(href).matches() && href.contains("ics.uci.edu") && !href.contains("?");
-
 	}
 
 	/**
@@ -57,19 +65,25 @@ public class Crawler extends WebCrawler {
 
 			pages.add(new PageProcessingData(page.getWebURL().getURL(), htmlParseData.getText(), htmlParseData.getHtml()));
 
+			System.out.println("Crawled " + page.getWebURL().getURL());
+
 			// If we hit the batch limit, the pages are added to the repository
 			if (pages.size() == BATCH_INSERT_LIMIT) {
-				try {
-					repository.insertPages(pages);
-				} catch (SQLException e) {
-					// TODO: see a better way to throw SQL Exceptions, which are
-					// checked exceptions
-					throw new RuntimeException(e.getMessage());
-				}
-
-				pages.clear();
+				insertPages();
 			}
 		}
+	}
+
+	private void insertPages() {
+		try {
+			repository.insertPages(pages);
+		} catch (SQLException e) {
+			// TODO: see a better way to throw SQL Exceptions, which are
+			// checked exceptions
+			throw new RuntimeException(e.getMessage());
+		}
+
+		pages.clear();
 	}
 
 }
