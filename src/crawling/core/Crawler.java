@@ -1,23 +1,27 @@
 package crawling.core;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import edu.uci.ics.crawler4j.crawler.Page;
-import edu.uci.ics.crawler4j.crawler.WebCrawler;
-import edu.uci.ics.crawler4j.parser.HtmlParseData;
-import edu.uci.ics.crawler4j.url.WebURL;
+import edu.uci.ics.crawler4j.crawler.*;
+import edu.uci.ics.crawler4j.parser.*;
+import edu.uci.ics.crawler4j.url.*;
+import java.io.*;
 
 /**
  * Represents a crawler that visits and collects information about web pages
  */
 public class Crawler extends WebCrawler {
+
+	
 	private static int count = 0;
-	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|csv|data|js|bmp|gif|jpe?g" + "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf|pde" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+
+	private final static Pattern FILTERS = Pattern
+			.compile(".*(\\.(css|csv|data|js|bmp|gif|jpe?g"
+					+ "|png|tiff?|mid|mp2|mp3|mp4"
+					+ "|wav|avi|mov|mpeg|ram|m4v|pdf|pde"
+					+ "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+
+
 	private IPagesRepository repository;
 	
 	@Override
@@ -31,6 +35,7 @@ public class Crawler extends WebCrawler {
 		repository = (IPagesRepository)data;
 	}
 	
+
 	/**
 	 * You should implement this function to specify whether the given url
 	 * should be crawled or not (based on your crawling logic).
@@ -38,8 +43,11 @@ public class Crawler extends WebCrawler {
 	@Override
 	public boolean shouldVisit(WebURL url) {
 		String href = url.getURL().toLowerCase();
-		return !FILTERS.matcher(href).matches() && href.contains("ics.uci.edu") && !href.startsWith("http://archive.ics.uci.edu/ml/datasets.html") && !href.startsWith("http://archive.ics.uci.edu/ml/machine-learning-databases/")
-				&& !href.contains("calendar");
+
+		return !FILTERS.matcher(href).matches()
+				&& href.contains("ics.uci.edu")
+				&& !href.contains("?");
+
 	}
 
 	/**
@@ -64,21 +72,27 @@ public class Crawler extends WebCrawler {
 			System.out.println("Html length: " + html.length());
 			System.out.println("Number of outgoing links: " + links.size());
 			System.out.println("Link number: " + count++);
-
-			try {
-				PrintWriter writer = new PrintWriter((new BufferedWriter(new FileWriter("output/myfile.txt", true))));
-				writer.println(url);
-				writer.println(text);
-				writer.println("\n");
-				writer.close();
+			
+			try{
+			PrintWriter writer = new PrintWriter((new BufferedWriter(new FileWriter("output/myfile.txt", true))));
+			writer.println(url);
+			writer.println(text);
+			writer.println("\n");
+			writer.close();
+			
+			PrintWriter writer2 = new PrintWriter((new BufferedWriter(new FileWriter("output/file"+ count + ".txt"))));
+			writer2.println(url);
+			writer2.println(html);
+			writer2.close();
 			} catch (IOException e) {
-
+				
 				e.printStackTrace();
 				System.exit(0);
 			} finally {
-
+				
 			}
 
 		}
 	}
+
 }
