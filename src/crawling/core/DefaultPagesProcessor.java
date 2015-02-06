@@ -26,7 +26,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		mostCommonNGrams = new HashMap<String, Integer>();
 	}
 
-	private final int PAGES_CHUNK_SIZE = 100;
+	private final static int PAGES_CHUNK_SIZE = 128;
 	private int pagesCount;
 	private String longestPageUrl;
 	private HashMap<String, Integer> subdomainsCount;
