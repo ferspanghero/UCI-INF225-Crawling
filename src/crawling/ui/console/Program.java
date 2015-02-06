@@ -149,6 +149,8 @@ public class Program {
 
 		config.setCrawlStorageFolder(".\\data\\crawl\\root");
 		config.setPolitenessDelay(500);
+		config.setMaxDepthOfCrawling(40);
+		config.setMaxPagesToFetch(10);
 		config.setUserAgentString("UCI WebCrawler 93082117/30489978/12409858");
 		config.setResumableCrawling(true);
 
