@@ -36,9 +36,10 @@ public class Crawler extends WebCrawler {
 		String href = url.getURL().toLowerCase();
 		return !FILTERS.matcher(href).matches()
 				&& href.contains("ics.uci.edu")
-				&& !href.startsWith("http://archive.ics.uci.edu/ml/datasets.html")
-				&& !href.startsWith("http://archive.ics.uci.edu/ml/machine-learning-databases/")
-				&& !href.contains("calendar");
+//				&& !href.startsWith("http://archive.ics.uci.edu/ml/datasets.html")
+//				&& !href.startsWith("http://archive.ics.uci.edu/ml/machine-learning-databases/")
+				&& !href.contains("?");
+//				&& !href.contains("calendar");
 	}
 
 	/**
@@ -67,6 +68,11 @@ public class Crawler extends WebCrawler {
 			writer.println(text);
 			writer.println("\n");
 			writer.close();
+			
+			PrintWriter writer2 = new PrintWriter((new BufferedWriter(new FileWriter("output/file"+ count + ".txt"))));
+			writer2.println(url);
+			writer2.println(html);
+			writer2.close();
 			} catch (IOException e) {
 				
 				e.printStackTrace();

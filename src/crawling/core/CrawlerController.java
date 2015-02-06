@@ -13,6 +13,7 @@ import edu.uci.ics.crawler4j.fetcher.*;
  */
 public class CrawlerController {
 	public void Run() throws Exception {
+
 		String crawlStorageFolder = ".\\data\\crawl\\root";
 		String userAgent = "UCI WebCrawler 93082117/30489978/12409858";
 		int numberOfCrawlers = 10;
@@ -20,8 +21,9 @@ public class CrawlerController {
 		CrawlConfig config = new CrawlConfig();
 		config.setCrawlStorageFolder(crawlStorageFolder);
 		config.setPolitenessDelay(500); // Set it to 500ms as per instructions
+		config.setMaxDepthOfCrawling(40);
 		config.setUserAgentString(userAgent);
-		config.setResumableCrawling(true);
+		//config.setResumableCrawling(true);
 
 		/*
 		 * Not sure if below is necessary
