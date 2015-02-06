@@ -1,5 +1,6 @@
 package crawling.core;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -12,6 +13,7 @@ public interface IPagesProcessor {
 	 * @param config
 	 *            The configuration that should be considered during the
 	 *            processing
+	 * @throws SQLException 
 	 */
 	/*
 	 * The reason for one single process method is efficiency. By doing this, we
@@ -19,7 +21,7 @@ public interface IPagesProcessor {
 	 * information
 	 */
 	void processPages(IPagesRepository repository,
-			PagesProcessorConfiguration config);
+			PagesProcessorConfiguration config) throws SQLException;
 
 	/**
 	 * Returns the number of unique crawled pages

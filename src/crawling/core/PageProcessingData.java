@@ -5,13 +5,15 @@ package crawling.core;
  * processing data
  */
 public class PageProcessingData {
-	public PageProcessingData(String url, String text) {
+	public PageProcessingData(String url, String text, String html) {
 		setUrl(url);
 		setText(text);
+		setHtml(html);
 	}
 
 	private String url;
 	private String text;
+	private String html;
 
 	public String getUrl() {
 		return url;
@@ -27,6 +29,14 @@ public class PageProcessingData {
 
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	public String getHtml() {
+		return html;
+	}
+
+	public void setHtml(String html) {
+		this.html = html;
 	}
 
 }

@@ -23,14 +23,8 @@ public class CrawlerController {
 		config.setPolitenessDelay(500); // Set it to 500ms as per instructions
 		config.setMaxDepthOfCrawling(40);
 		config.setUserAgentString(userAgent);
-		//config.setResumableCrawling(true);
+		config.setResumableCrawling(true);
 
-		/*
-		 * Not sure if below is necessary
-		 * confsigh.setProxyHost("https:////vpn.nacs.uci.edu//+CSCOE+//logon.html"
-		 * ); config.setProxyUsername(rsingerh);
-		 * config.getProxyPassword(password);
-		 */
 
 		/*
 		 * Instantiate the controller for this crawl.

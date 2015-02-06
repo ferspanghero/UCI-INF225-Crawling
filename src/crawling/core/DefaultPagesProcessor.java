@@ -1,5 +1,6 @@
 package crawling.core;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,8 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Represents a basic processor that does a set of operations with the crawled
@@ -35,7 +34,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 	private HashMap<String, Integer> mostCommonNGrams;
 
 	@Override
-	public void processPages(IPagesRepository repository, PagesProcessorConfiguration config) {
+	public void processPages(IPagesRepository repository, PagesProcessorConfiguration config) throws SQLException {
 		if (repository == null)
 			throw new IllegalArgumentException("The pages processor cannot be initialized with a null pages repository");
 
