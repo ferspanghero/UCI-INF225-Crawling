@@ -22,7 +22,8 @@ public class Crawler extends WebCrawler {
 
 	private final static int BATCH_INSERT_LIMIT = 128;
 	private List<PageProcessingData> pages;
-	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|csv|data|js|bmp|gif|jpe?g" + "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf|pde" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|csv|data|java|lif|js|bmp|gif|jpe?g" + "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf|pde" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+	private final static Pattern DOMAIN = Pattern.compile("http://.*\\.ics\\.uci\\.edu.*");
 	private IPagesRepository repository;
 
 	@Override
@@ -65,8 +66,9 @@ public class Crawler extends WebCrawler {
 	@Override
 	public boolean shouldVisit(WebURL url) {
 		String href = url.getURL().toLowerCase();
+		
 
-		return !FILTERS.matcher(href).matches() && href.contains("ics.uci.edu") && !href.contains("?");
+		return !FILTERS.matcher(href).matches() && DOMAIN.matcher(href).matches() && !href.contains("?");
 	}
 
 	/**

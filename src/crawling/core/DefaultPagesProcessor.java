@@ -197,21 +197,6 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		return longestPageLength;
 	}
 	
-	private void processSubdomains(List<PageProcessingData> pages) {
-		Pattern patt = Pattern.compile(".*ics\\.uci\\.edu.*");
-		String url;
-		
-		for (PageProcessingData page : pages) {
-			url = page.getUrl();
-			if(patt.matcher(url).matches()){	
-				String key = url.substring(0, url.indexOf("\\.edu",0)+4);
-				if (subdomainsCount.containsKey(key))
-					subdomainsCount.put(page.getUrl(), subdomainsCount.get(key)+1);
-				else
-					subdomainsCount.put(page.getUrl(), 1);
-			}
-		}
-	}
 
 	private <K, V extends Comparable<? super V>> Map<K, V> sortMapByValueDescending(Map<K, V> map) {
 		List<Entry<K, V>> sortedEntries = new ArrayList<Entry<K, V>>(map.entrySet());

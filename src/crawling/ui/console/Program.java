@@ -25,7 +25,7 @@ import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 public class Program {
 	private final static int POLITENESS_DELAY = 500;
 	private final static int MAX_DEPTH_OF_CRAWLING = 40;
-	private final static int MAX_PAGES_TO_FETCH = 10;
+	private final static int MAX_PAGES_TO_FETCH = 60000;
 	private final static int NUMBER_OF_CRAWLERS = 5;
 	private final static int N_GRAM_TYPE = 2;
 	private final static int MOST_FREQUENT_WORDS_COUNT = 500;
