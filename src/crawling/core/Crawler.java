@@ -92,8 +92,7 @@ public class Crawler extends WebCrawler {
 		try {
 			repository.insertPages(pages);
 		} catch (SQLException e) {
-			// TODO: see a better way to throw SQL Exceptions, which are checked exceptions
-			throw new RuntimeException(e.getMessage());
+			printMessage("Repository error while inserting pages: " + e.getMessage());
 		}
 
 		pages.clear();
