@@ -31,22 +31,22 @@ public class MySQLPagesRepository implements IPagesRepository {
 	}
 
 	@Override
-	public void insertPages(List<PageProcessingData> pages) throws SQLException {
-		if (pages != null) {
+	public int insertPage(PageProcessingData page) throws SQLException {
+		int updateCount = 0;
+
+		if (page != null) {
 			try (Connection connection = getConnection()) {
 				try (PreparedStatement statement = connection.prepareStatement("INSERT INTO crawledpages VALUES (?, ?, ?)")) {
-					for (PageProcessingData page : pages) {
-						statement.setString(1, page.getUrl());
-						statement.setString(2, page.getText());
-						statement.setString(3, page.getHtml());
+					statement.setString(1, page.getUrl());
+					statement.setString(2, page.getText());
+					statement.setString(3, page.getHtml());
 
-						statement.addBatch();
-					}
-
-					statement.executeBatch();
+					updateCount = statement.executeUpdate();
 				}
 			}
 		}
+
+		return updateCount;
 	}
 
 	@Override
@@ -73,31 +73,10 @@ public class MySQLPagesRepository implements IPagesRepository {
 				}
 			}
 		}
-		
+
 		currentPagesPaginationIndex++;
 
 		return pages;
-	}
-
-	@Override
-	public int[] deletePages(List<PageProcessingData> pages) throws SQLException {
-		int[] deleteCountArray = null;
-
-		if (pages != null) {
-			try (Connection connection = getConnection()) {
-				try (PreparedStatement statement = connection.prepareStatement("DELETE FROM crawledpages WHERE URL = ?")) {
-					for (PageProcessingData page : pages) {
-						statement.setString(1, page.getUrl());
-
-						statement.addBatch();
-					}
-
-					deleteCountArray = statement.executeBatch();
-				}
-			}
-		}
-
-		return deleteCountArray;
 	}
 
 	@Override
