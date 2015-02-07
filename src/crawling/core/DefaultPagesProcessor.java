@@ -185,7 +185,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 			if(patt.matcher(url).matches()){	
 				String key = url.substring(0, url.indexOf("\\.edu",0)+4);
 				if (subdomainsCount.containsKey(key))
-					subdomainsCount.put(page.getUrl(), +1);
+					subdomainsCount.put(page.getUrl(), subdomainsCount.get(key)+1);
 				else
 					subdomainsCount.put(page.getUrl(), 1);
 			}
