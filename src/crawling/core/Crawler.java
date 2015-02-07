@@ -1,7 +1,9 @@
 package crawling.core;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -42,10 +44,23 @@ public class Crawler extends WebCrawler {
 		
 		super.onBeforeExit();
 	}
+	
+	@Override
+	protected void onContentFetchError(WebURL webUrl) {
+		printMessage("ERROR! Could not fetch " + webUrl.getURL());
+		
+		super.onContentFetchError(webUrl);
+	}
+	
+	@Override
+	protected void onParseError(WebURL webUrl) {
+		printMessage("ERROR! Could not parse " + webUrl.getURL());
+		
+		super.onParseError(webUrl);
+	}
 
 	/**
-	 * You should implement this function to specify whether the given url
-	 * should be crawled or not (based on your crawling logic).
+	 * You should implement this function to specify whether the given url should be crawled or not (based on your crawling logic).
 	 */
 	@Override
 	public boolean shouldVisit(WebURL url) {
@@ -55,8 +70,7 @@ public class Crawler extends WebCrawler {
 	}
 
 	/**
-	 * This function is called when a page is fetched and ready to be processed
-	 * by your program.
+	 * This function is called when a page is fetched and ready to be processed by your program.
 	 */
 	@Override
 	public void visit(Page page) {
@@ -65,7 +79,7 @@ public class Crawler extends WebCrawler {
 
 			pages.add(new PageProcessingData(page.getWebURL().getURL(), htmlParseData.getText(), htmlParseData.getHtml()));
 
-			System.out.println("Crawled " + page.getWebURL().getURL());
+			printMessage("Crawled " + page.getWebURL().getURL());
 
 			// If we hit the batch limit, the pages are added to the repository
 			if (pages.size() == BATCH_INSERT_LIMIT) {
@@ -78,12 +92,17 @@ public class Crawler extends WebCrawler {
 		try {
 			repository.insertPages(pages);
 		} catch (SQLException e) {
-			// TODO: see a better way to throw SQL Exceptions, which are
-			// checked exceptions
+			// TODO: see a better way to throw SQL Exceptions, which are checked exceptions
 			throw new RuntimeException(e.getMessage());
 		}
 
 		pages.clear();
 	}
 
+	
+	private void printMessage(String message) {
+		String currentDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+		System.out.println("[" + currentDateTime + "] - " + message);
+	}
 }

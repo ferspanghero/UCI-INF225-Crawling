@@ -13,10 +13,10 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.Queue;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 /**
- * Represents a basic processor that does a set of operations with the crawled
- * pages
+ * Represents a basic processor that does a set of operations with the crawled pages
  */
 public class DefaultPagesProcessor implements IPagesProcessor {
 	public DefaultPagesProcessor() {
@@ -48,6 +48,9 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		while (pages != null && pages.size() > 0) {
 			// Computes pages count
 			processUniquePagesCount(pages);
+
+			// Computes subdomains count
+			processSubdomains(pages);
 
 			// Computes most common elements
 			processMostCommonElements(pages, config);
@@ -95,6 +98,24 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 
 	private void processUniquePagesCount(List<PageProcessingData> pages) {
 		pagesCount += pages.size();
+	}
+
+	private void processSubdomains(List<PageProcessingData> pages) {
+		Pattern patt = Pattern.compile(".*ics\\.uci\\.edu.*");
+		String url;
+
+		for (PageProcessingData page : pages) {
+			url = page.getUrl();
+
+			if (patt.matcher(url).matches()) {
+				String key = url.substring(0, url.indexOf("\\.edu", 0) + 4);
+
+				if (subdomainsCount.containsKey(key))
+					subdomainsCount.put(page.getUrl(), subdomainsCount.get(key) + 1);
+				else
+					subdomainsCount.put(page.getUrl(), 1);
+			}
+		}
 	}
 
 	private void processMostCommonElements(List<PageProcessingData> pages, PagesProcessorConfiguration config) {
