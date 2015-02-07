@@ -14,8 +14,7 @@ import java.util.Queue;
 import java.util.TreeMap;
 
 /**
- * Represents a basic processor that does a set of operations with the crawled
- * pages
+ * Represents a basic processor that does a set of operations with the crawled pages
  */
 public class DefaultPagesProcessor implements IPagesProcessor {
 	public DefaultPagesProcessor() {

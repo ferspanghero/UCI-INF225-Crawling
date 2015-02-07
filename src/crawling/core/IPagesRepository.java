@@ -6,6 +6,7 @@ import java.util.List;
 /**
  * Represents a repository that contains data about the crawled pages
  */
+// TODO: Include method to clear database
 public interface IPagesRepository {
 	/**
 	 * Sets the repository to read pages from the beginning
@@ -20,8 +21,7 @@ public interface IPagesRepository {
 	void insertPages(List<PageProcessingData> pages) throws SQLException;
 
 	/**
-	 * Retrieves the next page that can be sequentially iterated from the pages
-	 * repository
+	 * Retrieves the next page that can be sequentially iterated from the pages repository
 	 * 
 	 * @param pagesChunkSize
 	 *            Determines the number of pages that should be retrieved
