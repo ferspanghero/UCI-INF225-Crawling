@@ -30,7 +30,7 @@ public class Program {
 	private final static int N_GRAM_TYPE = 2;
 	private final static int MOST_FREQUENT_WORDS_COUNT = 500;
 	private final static int MOST_FREQUENT_N_GRAMS_COUNT = 20;
-	private final static String CRAWLING_AGENT_NAME = "UCI WebCrawler 93082117/30489978/12409858";
+	private final static String CRAWLING_AGENT_NAME = "TESTE"; //"UCI WebCrawler 93082117/30489978/12409858";
 	private final static String BASE_DOMAIN = "http://www.ics.uci.edu";
 
 	public static void main(String[] args) {
@@ -154,14 +154,14 @@ public class Program {
 		CrawlConfig config = new CrawlConfig();
 		ICrawlControllerBuilder crawlControllerBuilder = new DefaultCrawlControllerBuilder();
 
-		config.setCrawlStorageFolder(BASE_DOMAIN);
+		config.setCrawlStorageFolder(".\\data\\crawl\\root");
 		config.setPolitenessDelay(POLITENESS_DELAY);
 		config.setMaxDepthOfCrawling(MAX_DEPTH_OF_CRAWLING);
 		config.setMaxPagesToFetch(MAX_PAGES_TO_FETCH);
 		config.setUserAgentString(CRAWLING_AGENT_NAME);
 		config.setResumableCrawling(true);
 
-		manager.Run(new CrawlParameters(config, NUMBER_OF_CRAWLERS, "http://www.ics.uci.edu"), crawlControllerBuilder, repository, Crawler.class);
+		manager.Run(new CrawlParameters(config, NUMBER_OF_CRAWLERS, BASE_DOMAIN), crawlControllerBuilder, repository, Crawler.class);
 	}
 
 	private static IPagesProcessor processPages(IPagesRepository repository) throws SQLException {

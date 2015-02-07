@@ -1,6 +1,6 @@
 package crawling.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,6 +13,8 @@ import crawling.core.IPagesRepository;
 import crawling.core.MySQLPagesRepository;
 import crawling.core.PageProcessingData;
 
+// TODO: rewrite this class so that tests are not strongly coupled to the DB as they are for now
+// TODO: this needs more tests (reset scenario, many batch inserts and reads, etc.)
 public class MySQLPagesRepositoryTest {
 	private IPagesRepository repository;
 	private List<PageProcessingData> pages;
