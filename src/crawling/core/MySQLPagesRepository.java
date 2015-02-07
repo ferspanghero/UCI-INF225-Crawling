@@ -88,6 +88,5 @@ public class MySQLPagesRepository implements IPagesRepository {
 		// statements locally
 		// rewriteBatchedStatements=true tells MySQL to pack as many queries as
 		// possible into a single network packet
-		return DriverManager.getConnection("jdbc:mysql://localhost:3306/UCICrawling/?user=root&useServerPrepStmts=false&rewriteBatchedStatements=true");
-	}
+		return DriverManager.getConnection("jdbc:mysql://localhost:3306/ucicrawling?user=root&password=password&useServerPrepStmts=false&rewriteBatchedStatements=true");	}
 }
