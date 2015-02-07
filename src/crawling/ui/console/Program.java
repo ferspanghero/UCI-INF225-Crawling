@@ -30,7 +30,7 @@ public class Program {
 	private final static int N_GRAM_TYPE = 2;
 	private final static int MOST_FREQUENT_WORDS_COUNT = 500;
 	private final static int MOST_FREQUENT_N_GRAMS_COUNT = 20;
-	private final static String CRAWLING_AGENT_NAME = "TESTE"; //"UCI WebCrawler 93082117/30489978/12409858";
+	private final static String CRAWLING_AGENT_NAME = "UCI WebCrawler 93082117/30489978/12409858";
 	private final static String BASE_DOMAIN = "http://www.ics.uci.edu";
 
 	public static void main(String[] args) {
