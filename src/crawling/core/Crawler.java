@@ -67,8 +67,11 @@ public class Crawler extends WebCrawler {
 	public boolean shouldVisit(WebURL url) {
 		String href = url.getURL().toLowerCase();
 		
-
-		return !FILTERS.matcher(href).matches() && DOMAIN.matcher(href).matches() && !href.contains("?");
+		
+		if (FILTERS.matcher(href).matches() || href.contains("?") || href.startsWith("http://fano.ics.uci.edu") || href.startsWith("http://ftp.ics.uci.edu"))
+			return false;
+		else
+			return DOMAIN.matcher(href).matches();
 	}
 
 	/**
