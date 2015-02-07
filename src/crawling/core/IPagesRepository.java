@@ -13,11 +13,13 @@ public interface IPagesRepository {
 	void reset();
 
 	/**
-	 * Parses and inserts a page into the repository
+	 * Inserts a page into the repository
 	 * 
 	 * @throws SQLException
+	 * 
+	 * @return Value indicating if the operation was performed successfully
 	 */
-	void insertPages(List<PageProcessingData> pages) throws SQLException;
+	int insertPage(PageProcessingData page) throws SQLException;
 
 	/**
 	 * Retrieves the next page that can be sequentially iterated from the repository
@@ -27,15 +29,6 @@ public interface IPagesRepository {
 	 * @throws SQLException
 	 */
 	List<PageProcessingData> retrieveNextPages(int pagesChunkSize) throws SQLException;
-
-	/**
-	 * Deletes pages from the repository
-	 * 
-	 * @throws SQLException
-	 * 
-	 * @return Values indicating if the operations were performed successfully
-	 */
-	int[] deletePages(List<PageProcessingData> pages) throws SQLException;
 
 	/**
 	 * Clears the repository

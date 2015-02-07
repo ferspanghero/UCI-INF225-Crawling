@@ -2,9 +2,7 @@ package crawling.core;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import edu.uci.ics.crawler4j.crawler.Page;
@@ -16,12 +14,7 @@ import edu.uci.ics.crawler4j.url.WebURL;
  * Represents a crawler that visits and collects information about web pages
  */
 public class Crawler extends WebCrawler {
-	public Crawler() {
-		pages = new ArrayList<PageProcessingData>(BATCH_INSERT_LIMIT);
-	}
 
-	private final static int BATCH_INSERT_LIMIT = 128;
-	private List<PageProcessingData> pages;
 	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|csv|data|java|lif|js|bmp|gif|jpe?g" + "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf|pde" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
 	private final static Pattern DOMAIN = Pattern.compile("http://.*\\.ics\\.uci\\.edu.*");
 	private IPagesRepository repository;
@@ -38,25 +31,16 @@ public class Crawler extends WebCrawler {
 	}
 
 	@Override
-	public void onBeforeExit() {
-		if (pages.size() > 1) {
-			insertPages();
-		}
-		
-		super.onBeforeExit();
-	}
-	
-	@Override
 	protected void onContentFetchError(WebURL webUrl) {
 		printMessage("ERROR! Could not fetch " + webUrl.getURL());
-		
+
 		super.onContentFetchError(webUrl);
 	}
-	
+
 	@Override
 	protected void onParseError(WebURL webUrl) {
 		printMessage("ERROR! Could not parse " + webUrl.getURL());
-		
+
 		super.onParseError(webUrl);
 	}
 
@@ -82,29 +66,22 @@ public class Crawler extends WebCrawler {
 		if (page.getParseData() instanceof HtmlParseData) {
 			HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 
-			pages.add(new PageProcessingData(page.getWebURL().getURL(), htmlParseData.getText(), htmlParseData.getHtml()));
+			PageProcessingData pageProcessingData = new PageProcessingData(page.getWebURL().getURL(), htmlParseData.getText(), htmlParseData.getHtml());
 
-			printMessage("Crawled " + page.getWebURL().getURL());
+			printMessage("Crawled " + pageProcessingData.getUrl());
 
-			// If we hit the batch limit, the pages are added to the repository
-			if (pages.size() == BATCH_INSERT_LIMIT) {
-				insertPages();
-			}
+			insertPage(pageProcessingData);
 		}
 	}
 
-	private void insertPages() {
+	private void insertPage(PageProcessingData page) {
 		try {
-			repository.insertPages(pages);
+			repository.insertPage(page);
 		} catch (SQLException e) {
-			// TODO: see a better way to throw SQL Exceptions, which are checked exceptions
-			throw new RuntimeException(e.getMessage());
+			printMessage("Repository error while inserting " + page.getUrl() + ":" + e.getMessage());
 		}
-
-		pages.clear();
 	}
 
-	
 	private void printMessage(String message) {
 		String currentDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 
