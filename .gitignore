@@ -1,6 +1,8 @@
 /.settings/
 /.git/
-/data/
-/db/
-/bin/
 *.project
+*.class
+/bin/
+/.classpath
+/data/
+/output/
