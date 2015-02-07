@@ -41,8 +41,22 @@ public class Crawler extends WebCrawler {
 		if (pages.size() > 1) {
 			insertPages();
 		}
-
+		
 		super.onBeforeExit();
+	}
+	
+	@Override
+	protected void onContentFetchError(WebURL webUrl) {
+		printMessage("ERROR! Could not fetch " + webUrl.getURL());
+		
+		super.onContentFetchError(webUrl);
+	}
+	
+	@Override
+	protected void onParseError(WebURL webUrl) {
+		printMessage("ERROR! Could not parse " + webUrl.getURL());
+		
+		super.onParseError(webUrl);
 	}
 
 	/**
@@ -65,9 +79,7 @@ public class Crawler extends WebCrawler {
 
 			pages.add(new PageProcessingData(page.getWebURL().getURL(), htmlParseData.getText(), htmlParseData.getHtml()));
 
-			String currentDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-
-			System.out.println("[" + currentDateTime + "] - Crawled " + page.getWebURL().getURL());
+			printMessage("Crawled " + page.getWebURL().getURL());
 
 			// If we hit the batch limit, the pages are added to the repository
 			if (pages.size() == BATCH_INSERT_LIMIT) {
@@ -87,4 +99,10 @@ public class Crawler extends WebCrawler {
 		pages.clear();
 	}
 
+	
+	private void printMessage(String message) {
+		String currentDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+		System.out.println("[" + currentDateTime + "] - " + message);
+	}
 }

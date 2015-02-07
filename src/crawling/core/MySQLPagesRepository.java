@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Represents a MySql database that contains data about the crawled pages
  */
-// TODO: this class is not currently testable. Some parameters need to be injected
+// TODO: this class is not unit-testable. Some parameters need to be injected
 public class MySQLPagesRepository implements IPagesRepository {
 	public MySQLPagesRepository() throws ClassNotFoundException {
 		// Loads the MySQL driver
@@ -34,7 +34,7 @@ public class MySQLPagesRepository implements IPagesRepository {
 	public void insertPages(List<PageProcessingData> pages) throws SQLException {
 		if (pages != null) {
 			try (Connection connection = getConnection()) {
-				try (PreparedStatement statement = connection.prepareStatement("INSERT INTO CrawledPages VALUES (?, ?, ?)")) {
+				try (PreparedStatement statement = connection.prepareStatement("INSERT INTO crawledpages VALUES (?, ?, ?)")) {
 					for (PageProcessingData page : pages) {
 						statement.setString(1, page.getUrl());
 						statement.setString(2, page.getText());
@@ -61,7 +61,7 @@ public class MySQLPagesRepository implements IPagesRepository {
 				statement.setFetchSize(pagesChunkSize);
 				statement.setMaxRows(pagesChunkSize);
 
-				String sql = "SELECT URL, Text FROM CrawledPages LIMIT " + currentPagesPaginationIndex + ", " + pagesChunkSize;
+				String sql = "SELECT URL, Text FROM crawledpages LIMIT " + currentPagesPaginationIndex + ", " + pagesChunkSize;
 
 				try (ResultSet resultSet = statement.executeQuery(sql)) {
 					while (resultSet.next()) {
@@ -73,14 +73,52 @@ public class MySQLPagesRepository implements IPagesRepository {
 				}
 			}
 		}
+		
+		currentPagesPaginationIndex++;
 
 		return pages;
+	}
+
+	@Override
+	public int[] deletePages(List<PageProcessingData> pages) throws SQLException {
+		int[] deleteCountArray = null;
+
+		if (pages != null) {
+			try (Connection connection = getConnection()) {
+				try (PreparedStatement statement = connection.prepareStatement("DELETE FROM crawledpages WHERE URL = ?")) {
+					for (PageProcessingData page : pages) {
+						statement.setString(1, page.getUrl());
+
+						statement.addBatch();
+					}
+
+					deleteCountArray = statement.executeBatch();
+				}
+			}
+		}
+
+		return deleteCountArray;
+	}
+
+	@Override
+	public int clear() throws SQLException {
+		int deleteCount = 0;
+
+		try (Connection connection = getConnection()) {
+			try (Statement statement = connection.createStatement()) {
+				String sql = "DELETE FROM crawledpages";
+
+				deleteCount = statement.executeUpdate(sql);
+			}
+		}
+
+		return deleteCount;
 	}
 
 	private Connection getConnection() throws SQLException {
 		// TODO: make connection parameters configurable
 		// useServerPrepStmts=false tells MySQL to handle server-side prepared statements locally
 		// rewriteBatchedStatements=true tells MySQL to pack as many queries as possible into a single network packet
-		return DriverManager.getConnection("jdbc:mysql://localhost:3306/UCICrawling/?user=root&useServerPrepStmts=false&rewriteBatchedStatements=true");
+		return DriverManager.getConnection("jdbc:mysql://localhost:3306/ucicrawling?user=root&password=password&useServerPrepStmts=false&rewriteBatchedStatements=true");
 	}
 }
