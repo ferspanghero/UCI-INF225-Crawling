@@ -67,7 +67,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 	}
 
 	@Override
-	public Map<String, Integer> getSubdomainsCount() {
+	public Map<String, Integer> getSubdomains() {
 		// Sorts the map by its keys
 		TreeMap<String, Integer> sortedMap = new TreeMap<String, Integer>(subdomainsCount);
 

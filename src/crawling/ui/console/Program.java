@@ -116,7 +116,7 @@ public class Program {
 						if (processor == null) {
 							System.out.println(NOT_PROCESSED_ERROR_MESSAGE);
 						} else {
-							Map<String, Integer> subdomains = processor.getSubdomainsCount();
+							Map<String, Integer> subdomains = processor.getSubdomains();
 							
 							displayMapResult(subdomains, "Subdomains.txt");
 
@@ -182,8 +182,8 @@ public class Program {
 
 	private static IPagesProcessor processPages(IPagesRepository repository) throws SQLException {
 		IPagesProcessor processor = new DefaultPagesProcessor();
-		HashSet<String> stopWords = new HashSet<String>();
-
+		HashSet<String> stopWords = new HashSet<String>();		
+		
 		try (Scanner scanner = new Scanner(DefaultPagesProcessorTest.class.getResourceAsStream("/resources/stopwords.txt"))) {
 			while (scanner.hasNextLine()) {
 				stopWords.add(scanner.nextLine());
