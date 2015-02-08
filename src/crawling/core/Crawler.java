@@ -15,7 +15,7 @@ import edu.uci.ics.crawler4j.url.WebURL;
  */
 public class Crawler extends WebCrawler {
 
-	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|csv|data|java|lif|js|bmp|gif|jpe?g" + "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|pdf|pde" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|csv|data|java|lif|js|bmp|gif|jpe?g" + "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|ps|ppt|pdf|pde" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
 	private final static Pattern DOMAIN = Pattern.compile("http://.*\\.ics\\.uci\\.edu.*");
 	private IPagesRepository repository;
 

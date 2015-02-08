@@ -5,8 +5,8 @@
  
 	<appender name="file" class="org.apache.log4j.RollingFileAppender">
 	   <param name="append" value="false" />
-	   <param name="maxFileSize" value="10KB" />
-	   <param name="maxBackupIndex" value="5" />
+	   <param name="maxFileSize" value="40KB" />
+	   <param name="maxBackupIndex" value="10" />
 	   <!-- For Tomcat -->
 	   <param name="file" value="${catalina.home}/logs/myStruts1App.log" />
 	   <layout class="org.apache.log4j.PatternLayout">
