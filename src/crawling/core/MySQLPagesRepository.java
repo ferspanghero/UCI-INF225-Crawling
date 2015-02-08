@@ -74,7 +74,7 @@ public class MySQLPagesRepository implements IPagesRepository {
 			}
 		}
 
-		currentPagesPaginationIndex++;
+		currentPagesPaginationIndex += pagesChunkSize;
 
 		return pages;
 	}

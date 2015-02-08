@@ -1,5 +1,6 @@
 package crawling.ui.console;
 
+import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -47,95 +48,89 @@ public class Program {
 					option = stdin.nextInt();
 
 					switch (option) {
-					case 1:
+					case 1: {
 						long startTime = System.currentTimeMillis();
 
 						crawl(repository);
 
 						long elapsedTime = System.currentTimeMillis() - startTime;
 
-						String formattedElapsedTime = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedTime),
-								TimeUnit.MILLISECONDS.toMinutes(elapsedTime) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(elapsedTime)),
-								TimeUnit.MILLISECONDS.toSeconds(elapsedTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsedTime)));
+						String formattedElapsedTime = formatElapsedTime(elapsedTime);
 
 						System.out.println("\nPages crawled in " + formattedElapsedTime + "\n");
 						break;
-					case 2:
+					}
+					case 2: {
+						long startTime = System.currentTimeMillis();
+
 						processor = processPages(repository);
 
-						System.out.println("\nPages processed\n");
+						long elapsedTime = System.currentTimeMillis() - startTime;
+
+						String formattedElapsedTime = formatElapsedTime(elapsedTime);
+
+						System.out.println("\nPages processed in " + formattedElapsedTime + "\n");
 						break;
-					case 3:
+					}
+					case 3: {
 						if (processor == null) {
 							System.out.println(NOT_PROCESSED_ERROR_MESSAGE);
 						} else {
 							System.out.println("\n" + processor.getUniquePagesCount() + "\n");
 						}
 						break;
-					case 4:
+					}
+					case 4: {
 						if (processor == null) {
 							System.out.println(NOT_PROCESSED_ERROR_MESSAGE);
 						} else {
 							System.out.println("\n" + processor.getLongestPage() + "\n");
 						}
 						break;
-					case 5:
+					}
+					case 5: {
 						if (processor == null) {
 							System.out.println(NOT_PROCESSED_ERROR_MESSAGE);
 						} else {
 							Map<String, Integer> mostFrequentWords = processor.getMostCommonWords(MOST_FREQUENT_WORDS_COUNT);
-							Set<Entry<String, Integer>> entries = mostFrequentWords.entrySet();
-
-							System.out.println();
-
-							for (Entry<String, Integer> entry : entries) {
-								System.out.println(entry.getKey() + " - " + entry.getValue());
-							}
+							
+							displayMapResult(mostFrequentWords, "MostFrequentWords.txt");
 
 							System.out.println();
 						}
 						break;
-					case 6:
+					}
+					case 6: {
 						if (processor == null) {
 							System.out.println(NOT_PROCESSED_ERROR_MESSAGE);
 						} else {
 							Map<String, Integer> mostFrequent2Grams = processor.getMostCommonNGrams(MOST_FREQUENT_N_GRAMS_COUNT);
-							Set<Entry<String, Integer>> entries = mostFrequent2Grams.entrySet();
-
-							System.out.println();
-
-							for (Entry<String, Integer> entry : entries) {
-								System.out.println(entry.getKey() + " - " + entry.getValue());
-							}
+							
+							displayMapResult(mostFrequent2Grams, "MostFrequent2Grams.txt");
 
 							System.out.println();
 						}
 						break;
-					case 7:
+					}
+					case 7: {
 						if (processor == null) {
 							System.out.println(NOT_PROCESSED_ERROR_MESSAGE);
 						} else {
-							Map<String, Integer> mostFrequent2Grams = processor.getSubdomainsCount();
-							Set<Entry<String, Integer>> entries = mostFrequent2Grams.entrySet();
-
-							System.out.println();
-
-							try (PrintWriter printer = new PrintWriter("Subdomains.txt")) {
-								for (Entry<String, Integer> entry : entries) {
-									printer.println(entry.getKey() + " - " + entry.getValue());
-								}
-							}
+							Map<String, Integer> subdomains = processor.getSubdomainsCount();
+							
+							displayMapResult(subdomains, "Subdomains.txt");
 
 							System.out.println();
 						}
 						break;
+					}
 					}
 				} while (option != 0);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+	}	
 
 	private static void printOptions() {
 		System.out.println("(1) - Crawl UCI's domain");
@@ -147,6 +142,27 @@ public class Program {
 		System.out.println("(7) - Save subdomains");
 
 		System.out.println("(0) - Exit");
+	}
+
+	private static String formatElapsedTime(long elapsedTime) {
+		return String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedTime), TimeUnit.MILLISECONDS.toMinutes(elapsedTime) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(elapsedTime)),
+				TimeUnit.MILLISECONDS.toSeconds(elapsedTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsedTime)));
+	}
+	
+	private static void displayMapResult(Map<String, Integer> subdomains, String filePath) throws FileNotFoundException {
+		Set<Entry<String, Integer>> entries = subdomains.entrySet();
+
+		System.out.println();
+		
+		for (Entry<String, Integer> entry : entries) {
+			System.out.println(entry.getKey() + " - " + entry.getValue());
+		}
+
+		try (PrintWriter printer = new PrintWriter(filePath)) {
+			for (Entry<String, Integer> entry : entries) {
+				printer.println(entry.getKey() + " - " + entry.getValue());
+			}
+		}
 	}
 
 	private static void crawl(IPagesRepository repository) throws Exception {
