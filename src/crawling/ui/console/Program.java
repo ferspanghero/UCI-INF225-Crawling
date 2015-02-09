@@ -32,7 +32,8 @@ public class Program {
 	private final static int MOST_FREQUENT_WORDS_COUNT = 500;
 	private final static int MOST_FREQUENT_N_GRAMS_COUNT = 20;
 	private final static String CRAWLING_AGENT_NAME = "UCI WebCrawler 93082117/30489978/12409858";
-	private final static String BASE_DOMAIN = "http://www.ics.uci.edu";
+	private final static String BASE_DOMAIN = "ics.uci.edu";
+	private final static String BASE_DOMAIN_URL = "http://www." + BASE_DOMAIN;
 
 	public static void main(String[] args) {
 		try {
@@ -139,7 +140,7 @@ public class Program {
 		System.out.println("(4) - Display longest page URL");
 		System.out.println("(5) - Display top " + MOST_FREQUENT_WORDS_COUNT + " most frequent words");
 		System.out.println("(6) - Display top " + MOST_FREQUENT_N_GRAMS_COUNT + " most frequent " + N_GRAM_TYPE + "-grams");
-		System.out.println("(7) - Save subdomains");
+		System.out.println("(7) - Display subdomains");
 
 		System.out.println("(0) - Exit");
 	}
@@ -177,7 +178,7 @@ public class Program {
 		config.setUserAgentString(CRAWLING_AGENT_NAME);
 		config.setResumableCrawling(true);
 
-		manager.Run(new CrawlParameters(config, NUMBER_OF_CRAWLERS, BASE_DOMAIN), crawlControllerBuilder, repository, Crawler.class);
+		manager.Run(new CrawlParameters(config, NUMBER_OF_CRAWLERS, BASE_DOMAIN_URL), crawlControllerBuilder, repository, Crawler.class);
 	}
 
 	private static IPagesProcessor processPages(IPagesRepository repository) throws SQLException {
@@ -190,7 +191,7 @@ public class Program {
 			}
 		}
 
-		processor.processPages(repository, new PagesProcessorConfiguration(stopWords, N_GRAM_TYPE));
+		processor.processPages(repository, new PagesProcessorConfiguration(stopWords, N_GRAM_TYPE, "ics.uci.edu"));
 
 		return processor;
 	}

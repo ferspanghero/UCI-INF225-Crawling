@@ -46,7 +46,7 @@ public class DefaultPagesProcessorTest {
 			}
 		}
 
-		return new PagesProcessorConfiguration(stopWords, 2);
+		return new PagesProcessorConfiguration(stopWords, 2, "ics.uci.edu");
 	}
 
 	private List<PageProcessingData> getTestPageProcessingData() {
@@ -81,11 +81,11 @@ public class DefaultPagesProcessorTest {
 		processor.processPages(repository, config);
 		subdomains = processor.getSubdomains().entrySet().toArray(subdomains);
 
-		// Assert
-		assertEquals(subdomains[0].getKey(), "http://www.ics.uci.edu");
-		assertEquals(subdomains[0].getValue(), new Integer(2));
-		assertEquals(subdomains[1].getKey(), "http://graphics.ics.uci.edu");
-		assertEquals(subdomains[1].getValue(), new Integer(1));
+		// Assert		
+		assertEquals(subdomains[0].getKey(), "http://graphics.ics.uci.edu");
+		assertEquals(subdomains[0].getValue(), new Integer(1));
+		assertEquals(subdomains[1].getKey(), "http://www.ics.uci.edu");
+		assertEquals(subdomains[1].getValue(), new Integer(2));
 	}
 
 	@Test

@@ -49,7 +49,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 			processUniquePagesCount(pages);
 
 			// Computes subdomains count
-			processSubdomains(pages);
+			processSubdomains(pages, config.getBaseSubdomain());
 
 			// Computes most common elements
 			processMostCommonElements(pages, config);
@@ -96,20 +96,18 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		pagesCount += pages.size();
 	}
 
-	private void processSubdomains(List<PageProcessingData> pages) {
-		Pattern patt = Pattern.compile(".*ics\\.uci\\.edu.*");
-		String url;
-
+	private void processSubdomains(List<PageProcessingData> pages, String baseSubdomain) {
 		for (PageProcessingData page : pages) {
-			url = page.getUrl();
+			String url = page.getUrl();
+			String[] urlParts = url.split(baseSubdomain);
 
-			if (patt.matcher(url).matches()) {
-				String key = url.substring(0, url.indexOf("\\.edu", 0) + 4);
+			if (urlParts != null && urlParts.length > 0) {
+				String key = urlParts[0] + baseSubdomain;
 
 				if (subdomainsCount.containsKey(key))
-					subdomainsCount.put(page.getUrl(), subdomainsCount.get(key) + 1);
+					subdomainsCount.put(key, subdomainsCount.get(key) + 1);
 				else
-					subdomainsCount.put(page.getUrl(), 1);
+					subdomainsCount.put(key, 1);
 			}
 		}
 	}
