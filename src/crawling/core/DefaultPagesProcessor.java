@@ -101,20 +101,16 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 	}
 
 	private void processSubdomains(List<PageProcessingData> pages) {
-		Pattern patt = Pattern.compile(".*ics\\.uci\\.edu.*");
 		String url;
 
 		for (PageProcessingData page : pages) {
 			url = page.getUrl();
+			url = url.substring(0, url.indexOf("ics.uci.edu") + 11);
 
-			if (patt.matcher(url).matches()) {
-				String key = url.substring(0, url.indexOf("\\.edu", 0) + 4);
-
-				if (subdomainsCount.containsKey(key))
-					subdomainsCount.put(page.getUrl(), subdomainsCount.get(key) + 1);
-				else
-					subdomainsCount.put(page.getUrl(), 1);
-			}
+			if (subdomainsCount.containsKey(url))
+				subdomainsCount.put(url, subdomainsCount.get(url) + 1);
+			else
+				subdomainsCount.put(url, 1);			
 		}
 	}
 
