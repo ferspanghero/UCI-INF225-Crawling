@@ -1,7 +1,6 @@
 package crawling.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,8 +24,9 @@ public class DefaultPagesProcessorTest {
 	private DefaultPagesProcessor processor;
 	private IPagesRepository repository;
 	private PagesProcessorConfiguration config;
-	private final int SAMPLE_PAGES_COUNT = 5;
-	private final int MOST_COMMON_COUNT = 2;
+	private final static int SAMPLE_PAGES_COUNT = 3;
+	private final static int MOST_COMMON_COUNT = 2;
+	private final static String LONGEST_URL = "http://graphics.ics.uci.edu/about";
 
 	@Before
 	public final void initialize() throws SQLException {
@@ -46,17 +46,15 @@ public class DefaultPagesProcessorTest {
 			}
 		}
 
-		return new PagesProcessorConfiguration(stopWords, 2);
+		return new PagesProcessorConfiguration(stopWords, 2, "ics.uci.edu");
 	}
 
 	private List<PageProcessingData> getTestPageProcessingData() {
 		ArrayList<PageProcessingData> pages = new ArrayList<PageProcessingData>();
 
-		for (int i = 1; i <= SAMPLE_PAGES_COUNT - 1; i++) {
-			pages.add(new PageProcessingData("www.testurl" + i + ".com", "A cool sample text" + i, ""));
-		}
-
-		pages.add(new PageProcessingData("www.testurl" + SAMPLE_PAGES_COUNT + ".com", "Largest sample text ever", ""));
+		pages.add(new PageProcessingData("http://www.ics.uci.edu/about/equity/", "A sample text 1", "<html>1</html>"));
+		pages.add(new PageProcessingData("http://www.ics.uci.edu/about/equity/", "A sample text 2", "<html>1</html>"));
+		pages.add(new PageProcessingData("http://graphics.ics.uci.edu/about", "A larger sample here", "<html>1</html>"));
 
 		return pages;
 	}
@@ -75,8 +73,19 @@ public class DefaultPagesProcessorTest {
 	}
 
 	@Test
-	public final void testGetSubdomains() {
-		fail("Not yet implemented");
+	public final void testGetSubdomains() throws SQLException {
+		// Arrange
+		Entry<String, Integer>[] subdomains = (Entry<String, Integer>[]) new Entry[2];
+
+		// Act
+		processor.processPages(repository, config);
+		subdomains = processor.getSubdomains().entrySet().toArray(subdomains);
+
+		// Assert		
+		assertEquals(subdomains[0].getKey(), "http://graphics.ics.uci.edu");
+		assertEquals(subdomains[0].getValue(), new Integer(1));
+		assertEquals(subdomains[1].getKey(), "http://www.ics.uci.edu");
+		assertEquals(subdomains[1].getValue(), new Integer(2));
 	}
 
 	@Test
@@ -89,7 +98,7 @@ public class DefaultPagesProcessorTest {
 		longestPage = processor.getLongestPage();
 
 		// Assert
-		assertEquals(longestPage, "www.testurl" + SAMPLE_PAGES_COUNT + ".com");
+		assertEquals(longestPage, LONGEST_URL);
 	}
 
 	@Test
@@ -105,7 +114,7 @@ public class DefaultPagesProcessorTest {
 		assertEquals(mostCommonWords.length, MOST_COMMON_COUNT);
 		assertEquals(mostCommonWords[0].getKey(), "sample");
 		assertEquals(mostCommonWords[0].getValue(), new Integer(SAMPLE_PAGES_COUNT));
-		assertEquals(mostCommonWords[1].getKey(), "cool");
+		assertEquals(mostCommonWords[1].getKey(), "text");
 		assertEquals(mostCommonWords[1].getValue(), new Integer(SAMPLE_PAGES_COUNT - 1));
 	}
 
@@ -119,7 +128,7 @@ public class DefaultPagesProcessorTest {
 
 		// Assert
 		assertEquals(mostCommonNGrams.length, MOST_COMMON_COUNT);
-		assertEquals(mostCommonNGrams[0].getKey(), "cool sample");
+		assertEquals(mostCommonNGrams[0].getKey(), "sample text");
 		assertEquals(mostCommonNGrams[0].getValue(), new Integer(SAMPLE_PAGES_COUNT - 1));
 	}
 

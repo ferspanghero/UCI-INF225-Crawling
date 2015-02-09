@@ -50,16 +50,13 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 			processUniquePagesCount(pages);
 
 			// Computes subdomains count
-			processSubdomains(pages);
+			processSubdomains(pages, config.getBaseSubdomain());
 
 			// Computes most common elements
 			processMostCommonElements(pages, config);
 
 			// Computes longest page
 			longestPageLength = processLongestPage(pages, longestPageLength);
-			
-			//Computes subdomain counts
-			processSubdomains(pages);
 
 			pages = repository.retrieveNextPages(PAGES_CHUNK_SIZE);
 		}
@@ -71,7 +68,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 	}
 
 	@Override
-	public Map<String, Integer> getSubdomainsCount() {
+	public Map<String, Integer> getSubdomains() {
 		// Sorts the map by its keys
 		TreeMap<String, Integer> sortedMap = new TreeMap<String, Integer>(subdomainsCount);
 
@@ -100,17 +97,21 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		pagesCount += pages.size();
 	}
 
-	private void processSubdomains(List<PageProcessingData> pages) {
-		String url;
 
+	private void processSubdomains(List<PageProcessingData> pages, String baseSubdomain) {
 		for (PageProcessingData page : pages) {
-			url = page.getUrl();
-			url = url.substring(0, url.indexOf("ics.uci.edu") + 11);
+			String url = page.getUrl();
+			String[] urlParts = url.split(baseSubdomain);
 
-			if (subdomainsCount.containsKey(url))
-				subdomainsCount.put(url, subdomainsCount.get(url) + 1);
-			else
-				subdomainsCount.put(url, 1);			
+			if (urlParts != null && urlParts.length > 0) {
+				String key = urlParts[0] + baseSubdomain;
+
+				if (subdomainsCount.containsKey(key))
+					subdomainsCount.put(key, subdomainsCount.get(key) + 1);
+				else
+					subdomainsCount.put(key, 1);
+			}
+
 		}
 	}
 

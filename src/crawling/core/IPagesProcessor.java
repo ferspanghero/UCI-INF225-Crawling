@@ -31,7 +31,7 @@ public interface IPagesProcessor {
 	/**
 	 * Gets the number of subdomains found per page
 	 */
-	Map<String, Integer> getSubdomainsCount();
+	Map<String, Integer> getSubdomains();
 
 	/**
 	 * Gets the crawled page with the longest plain text
