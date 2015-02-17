@@ -1,4 +1,4 @@
-package crawling.test;
+package searchengine.test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -7,11 +7,11 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 
-import crawling.core.CrawlParameters;
-import crawling.core.Crawler;
-import crawling.core.CrawlerManager;
-import crawling.core.ICrawlControllerBuilder;
-import crawling.core.IPagesRepository;
+import searchengine.core.CrawlParameters;
+import searchengine.core.Crawler;
+import searchengine.core.CrawlerManager;
+import searchengine.core.ICrawlControllerBuilder;
+import searchengine.core.IPagesRepository;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 
 public class CrawlerManagerTest {

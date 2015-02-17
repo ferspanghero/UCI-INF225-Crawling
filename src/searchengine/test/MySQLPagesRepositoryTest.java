@@ -1,4 +1,4 @@
-package crawling.test;
+package searchengine.test;
 
 import static org.junit.Assert.assertTrue;
 
@@ -8,9 +8,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import crawling.core.IPagesRepository;
-import crawling.core.MySQLPagesRepository;
-import crawling.core.PageProcessingData;
+import searchengine.core.IPagesRepository;
+import searchengine.core.MySQLPagesRepository;
+import searchengine.core.PageProcessingData;
 
 // TODO: rewrite this class so that tests are not strongly coupled to the DB as they are for now
 // TODO: this needs more tests (reset scenario, many batch inserts and reads, etc.)

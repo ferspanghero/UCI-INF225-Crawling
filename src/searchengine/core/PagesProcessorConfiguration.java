@@ -1,4 +1,4 @@
-package crawling.core;
+package searchengine.core;
 
 import java.util.HashSet;
 

@@ -1,4 +1,4 @@
-package crawling.test;
+package searchengine.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyInt;
@@ -15,10 +15,10 @@ import java.util.Scanner;
 import org.junit.Before;
 import org.junit.Test;
 
-import crawling.core.DefaultPagesProcessor;
-import crawling.core.IPagesRepository;
-import crawling.core.PageProcessingData;
-import crawling.core.PagesProcessorConfiguration;
+import searchengine.core.DefaultPagesProcessor;
+import searchengine.core.IPagesRepository;
+import searchengine.core.PageProcessingData;
+import searchengine.core.PagesProcessorConfiguration;
 
 public class DefaultPagesProcessorTest {
 	private DefaultPagesProcessor processor;

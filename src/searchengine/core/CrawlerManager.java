@@ -2,7 +2,7 @@
  * Some of this code is lifted directly from the crawler4j website and we do not profess
  * to have done it ourselves.
  */
-package crawling.core;
+package searchengine.core;
 
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;

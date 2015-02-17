@@ -1,4 +1,4 @@
-package crawling.core;
+package searchengine.core;
 
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;

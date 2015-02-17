@@ -1,4 +1,4 @@
-package crawling.core;
+package searchengine.core;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

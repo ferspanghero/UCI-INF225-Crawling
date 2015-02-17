@@ -1,4 +1,4 @@
-package crawling.ui.console;
+package searchengine.ui.console;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -10,17 +10,17 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import crawling.core.CrawlParameters;
-import crawling.core.Crawler;
-import crawling.core.CrawlerManager;
-import crawling.core.DefaultCrawlControllerBuilder;
-import crawling.core.DefaultPagesProcessor;
-import crawling.core.ICrawlControllerBuilder;
-import crawling.core.IPagesProcessor;
-import crawling.core.IPagesRepository;
-import crawling.core.MySQLPagesRepository;
-import crawling.core.PagesProcessorConfiguration;
-import crawling.test.DefaultPagesProcessorTest;
+import searchengine.core.CrawlParameters;
+import searchengine.core.Crawler;
+import searchengine.core.CrawlerManager;
+import searchengine.core.DefaultCrawlControllerBuilder;
+import searchengine.core.DefaultPagesProcessor;
+import searchengine.core.ICrawlControllerBuilder;
+import searchengine.core.IPagesProcessor;
+import searchengine.core.IPagesRepository;
+import searchengine.core.MySQLPagesRepository;
+import searchengine.core.PagesProcessorConfiguration;
+import searchengine.test.DefaultPagesProcessorTest;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 
 public class Program {

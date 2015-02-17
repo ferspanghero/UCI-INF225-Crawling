@@ -1,4 +1,4 @@
-package crawling.core;
+package searchengine.core;
 
 /**
  * Represents a lightweight version of a Page that only contains relevant
