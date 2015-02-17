@@ -172,11 +172,13 @@ public class Program {
 		ICrawlControllerBuilder crawlControllerBuilder = new DefaultCrawlControllerBuilder();
 
 		config.setCrawlStorageFolder(".\\data\\crawl\\root");
+
 		config.setPolitenessDelay(POLITENESS_DELAY);
 		config.setMaxDepthOfCrawling(MAX_DEPTH_OF_CRAWLING);
 		config.setMaxPagesToFetch(MAX_PAGES_TO_FETCH);
 		config.setUserAgentString(CRAWLING_AGENT_NAME);
 		config.setResumableCrawling(true);
+
 
 		manager.Run(new CrawlParameters(config, NUMBER_OF_CRAWLERS, BASE_DOMAIN_URL), crawlControllerBuilder, repository, Crawler.class);
 	}

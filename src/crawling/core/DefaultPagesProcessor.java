@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
@@ -96,6 +97,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		pagesCount += pages.size();
 	}
 
+
 	private void processSubdomains(List<PageProcessingData> pages, String baseSubdomain) {
 		for (PageProcessingData page : pages) {
 			String url = page.getUrl();
@@ -109,6 +111,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 				else
 					subdomainsCount.put(key, 1);
 			}
+
 		}
 	}
 
@@ -190,6 +193,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 
 		return longestPageLength;
 	}
+	
 
 	private <K, V extends Comparable<? super V>> Map<K, V> sortMapByValueDescending(Map<K, V> map) {
 		List<Entry<K, V>> sortedEntries = new ArrayList<Entry<K, V>>(map.entrySet());

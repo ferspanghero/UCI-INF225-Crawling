@@ -96,8 +96,10 @@ public class MySQLPagesRepository implements IPagesRepository {
 
 	private Connection getConnection() throws SQLException {
 		// TODO: make connection parameters configurable
+
 		// useServerPrepStmts=false tells MySQL to handle server-side prepared statements locally
 		// rewriteBatchedStatements=true tells MySQL to pack as many queries as possible into a single network packet
 		return DriverManager.getConnection("jdbc:mysql://localhost:3306/ucicrawling?user=root&password=password&useServerPrepStmts=false&rewriteBatchedStatements=true");
 	}
 }
+
