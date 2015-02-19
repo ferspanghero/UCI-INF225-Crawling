@@ -2,8 +2,9 @@
  * Some of this code is lifted directly from the crawler4j website and we do not profess
  * to have done it ourselves.
  */
-package searchengine.core;
+package searchengine.core.crawling;
 
+import searchengine.core.repository.IRepositoriesFactory;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 
@@ -11,7 +12,7 @@ import edu.uci.ics.crawler4j.crawler.WebCrawler;
  * Represents a controller that manages the pages crawler
  */
 public class CrawlerManager {
-	public void Run(CrawlParameters parameters, ICrawlControllerBuilder crawlControllerBuilder, IPagesRepository repository, Class<? extends WebCrawler> crawlerType) throws Exception {
+	public void Run(CrawlParameters parameters, ICrawlControllerBuilder crawlControllerBuilder, IRepositoriesFactory repositoriesFactory, Class<? extends WebCrawler> crawlerType) throws Exception {
 		/*
 		 * Instantiate the controller for this crawl.
 		 */
@@ -25,7 +26,7 @@ public class CrawlerManager {
 		controller.addSeed(parameters.getBaseDomain());
 
 		// Injects the repository into the crawler
-		controller.setCustomData(repository);
+		controller.setCustomData(repositoriesFactory);
 		
 		/*
 		 * Start the crawl. This is a blocking operation, meaning that your code

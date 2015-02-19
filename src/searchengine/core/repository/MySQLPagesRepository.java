@@ -1,4 +1,4 @@
-package searchengine.core;
+package searchengine.core.repository;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import searchengine.core.PageProcessingData;
 
 /**
  * Represents a MySql database that contains data about the crawled pages
@@ -29,26 +31,7 @@ public class MySQLPagesRepository implements IPagesRepository {
 	public void reset() {
 		currentPagesPaginationIndex = 0;
 	}
-
-	@Override
-	public int insertPage(PageProcessingData page) throws SQLException {
-		int updateCount = 0;
-
-		if (page != null) {
-			try (Connection connection = getConnection()) {
-				try (PreparedStatement statement = connection.prepareStatement("INSERT INTO crawledpages VALUES (?, ?, ?)")) {
-					statement.setString(1, page.getUrl());
-					statement.setString(2, page.getText());
-					statement.setString(3, page.getHtml());
-
-					updateCount = statement.executeUpdate();
-				}
-			}
-		}
-
-		return updateCount;
-	}
-
+	
 	@Override
 	public List<PageProcessingData> retrieveNextPages(int pagesChunkSize) throws SQLException {
 		List<PageProcessingData> pages = new ArrayList<PageProcessingData>();
@@ -80,7 +63,57 @@ public class MySQLPagesRepository implements IPagesRepository {
 	}
 
 	@Override
-	public int clear() throws SQLException {
+	public int[] insertPages(List<PageProcessingData> pages) throws SQLException {
+		int[] updateCounts = null;
+
+		if (pages != null) {
+			try (Connection connection = getConnection()) {
+				try (PreparedStatement statement = connection.prepareStatement("INSERT INTO crawledpages VALUES (?, ?, ?)")) {
+					for (PageProcessingData page : pages) {
+						statement.setString(1, page.getUrl());
+						statement.setString(2, page.getText());
+						statement.setString(3, page.getHtml());
+
+						statement.addBatch();
+					}
+
+					updateCounts = statement.executeBatch();
+				}
+			}
+		}
+
+		return updateCounts;
+	}
+	
+	@Override
+	public int[] updatePages(List<PageProcessingData> pages) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public int[] deletePages(List<PageProcessingData> pages) throws SQLException {
+		int[] deleteCountArray = null;
+
+		if (pages != null) {
+			try (Connection connection = getConnection()) {
+				try (PreparedStatement statement = connection.prepareStatement("DELETE FROM crawledpages WHERE URL = ?")) {
+					for (PageProcessingData page : pages) {
+						statement.setString(1, page.getUrl());
+
+						statement.addBatch();
+					}
+
+					deleteCountArray = statement.executeBatch();
+				}
+			}
+		}
+
+		return deleteCountArray;
+	}
+
+	@Override
+	public int clearPages() throws SQLException {
 		int deleteCount = 0;
 
 		try (Connection connection = getConnection()) {

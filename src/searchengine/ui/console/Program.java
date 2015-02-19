@@ -10,16 +10,16 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import searchengine.core.CrawlParameters;
-import searchengine.core.Crawler;
-import searchengine.core.CrawlerManager;
-import searchengine.core.DefaultCrawlControllerBuilder;
 import searchengine.core.DefaultPagesProcessor;
-import searchengine.core.ICrawlControllerBuilder;
 import searchengine.core.IPagesProcessor;
-import searchengine.core.IPagesRepository;
-import searchengine.core.MySQLPagesRepository;
 import searchengine.core.PagesProcessorConfiguration;
+import searchengine.core.crawling.CrawlParameters;
+import searchengine.core.crawling.Crawler;
+import searchengine.core.crawling.CrawlerManager;
+import searchengine.core.crawling.DefaultCrawlControllerBuilder;
+import searchengine.core.crawling.ICrawlControllerBuilder;
+import searchengine.core.repository.IRepositoriesFactory;
+import searchengine.core.repository.MySQLRepositoriesFactory;
 import searchengine.test.DefaultPagesProcessorTest;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 
@@ -39,7 +39,7 @@ public class Program {
 		try {
 			int option;
 			final String NOT_PROCESSED_ERROR_MESSAGE = "\nPages must be processed first\n";
-			IPagesRepository repository = new MySQLPagesRepository();
+			IRepositoriesFactory repositoriesFactory = new MySQLRepositoriesFactory();
 			IPagesProcessor processor = null;
 
 			try (Scanner stdin = new Scanner(System.in)) {
@@ -52,7 +52,7 @@ public class Program {
 					case 1: {
 						long startTime = System.currentTimeMillis();
 
-						crawl(repository);
+						crawl(repositoriesFactory);
 
 						long elapsedTime = System.currentTimeMillis() - startTime;
 
@@ -64,7 +64,7 @@ public class Program {
 					case 2: {
 						long startTime = System.currentTimeMillis();
 
-						processor = processPages(repository);
+						processor = processPages(repositoriesFactory);
 
 						long elapsedTime = System.currentTimeMillis() - startTime;
 
@@ -94,7 +94,7 @@ public class Program {
 							System.out.println(NOT_PROCESSED_ERROR_MESSAGE);
 						} else {
 							Map<String, Integer> mostFrequentWords = processor.getMostCommonWords(MOST_FREQUENT_WORDS_COUNT);
-							
+
 							displayMapResult(mostFrequentWords, "MostFrequentWords.txt");
 
 							System.out.println();
@@ -106,7 +106,7 @@ public class Program {
 							System.out.println(NOT_PROCESSED_ERROR_MESSAGE);
 						} else {
 							Map<String, Integer> mostFrequent2Grams = processor.getMostCommonNGrams(MOST_FREQUENT_N_GRAMS_COUNT);
-							
+
 							displayMapResult(mostFrequent2Grams, "MostFrequent2Grams.txt");
 
 							System.out.println();
@@ -118,7 +118,7 @@ public class Program {
 							System.out.println(NOT_PROCESSED_ERROR_MESSAGE);
 						} else {
 							Map<String, Integer> subdomains = processor.getSubdomains();
-							
+
 							displayMapResult(subdomains, "Subdomains.txt");
 
 							System.out.println();
@@ -131,7 +131,7 @@ public class Program {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}	
+	}
 
 	private static void printOptions() {
 		System.out.println("(1) - Crawl UCI's domain");
@@ -149,12 +149,12 @@ public class Program {
 		return String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(elapsedTime), TimeUnit.MILLISECONDS.toMinutes(elapsedTime) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(elapsedTime)),
 				TimeUnit.MILLISECONDS.toSeconds(elapsedTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsedTime)));
 	}
-	
+
 	private static void displayMapResult(Map<String, Integer> subdomains, String filePath) throws FileNotFoundException {
 		Set<Entry<String, Integer>> entries = subdomains.entrySet();
 
 		System.out.println();
-		
+
 		for (Entry<String, Integer> entry : entries) {
 			System.out.println(entry.getKey() + " - " + entry.getValue());
 		}
@@ -166,7 +166,7 @@ public class Program {
 		}
 	}
 
-	private static void crawl(IPagesRepository repository) throws Exception {
+	private static void crawl(IRepositoriesFactory repositoriesFactory) throws Exception {
 		CrawlerManager manager = new CrawlerManager();
 		CrawlConfig config = new CrawlConfig();
 		ICrawlControllerBuilder crawlControllerBuilder = new DefaultCrawlControllerBuilder();
@@ -178,20 +178,20 @@ public class Program {
 		config.setUserAgentString(CRAWLING_AGENT_NAME);
 		config.setResumableCrawling(true);
 
-		manager.Run(new CrawlParameters(config, NUMBER_OF_CRAWLERS, BASE_DOMAIN_URL), crawlControllerBuilder, repository, Crawler.class);
+		manager.Run(new CrawlParameters(config, NUMBER_OF_CRAWLERS, BASE_DOMAIN_URL), crawlControllerBuilder, repositoriesFactory, Crawler.class);
 	}
 
-	private static IPagesProcessor processPages(IPagesRepository repository) throws SQLException {
+	private static IPagesProcessor processPages(IRepositoriesFactory repositoriesFactory) throws SQLException, ClassNotFoundException {
 		IPagesProcessor processor = new DefaultPagesProcessor();
-		HashSet<String> stopWords = new HashSet<String>();		
-		
+		HashSet<String> stopWords = new HashSet<String>();
+
 		try (Scanner scanner = new Scanner(DefaultPagesProcessorTest.class.getResourceAsStream("/resources/stopwords.txt"))) {
 			while (scanner.hasNextLine()) {
 				stopWords.add(scanner.nextLine());
 			}
 		}
 
-		processor.processPages(repository, new PagesProcessorConfiguration(stopWords, N_GRAM_TYPE, "ics.uci.edu"));
+		processor.processPages(repositoriesFactory, new PagesProcessorConfiguration(stopWords, N_GRAM_TYPE, "ics.uci.edu"));
 
 		return processor;
 	}

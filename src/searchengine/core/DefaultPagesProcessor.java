@@ -13,6 +13,8 @@ import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import searchengine.core.repository.IRepositoriesFactory;
+
 /**
  * Represents a basic processor that does a set of operations with the crawled pages
  */
@@ -33,15 +35,18 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 	private HashMap<String, Integer> mostCommonNGrams;
 
 	@Override
-	public void processPages(IPagesRepository repository, PagesProcessorConfiguration config) throws SQLException {
-		if (repository == null)
-			throw new IllegalArgumentException("The pages processor cannot be initialized with a null pages repository");
+	public void processPages(IRepositoriesFactory repositoriesFactory, PagesProcessorConfiguration config) throws SQLException, ClassNotFoundException {
+		if (repositoriesFactory == null)
+			throw new IllegalArgumentException("The pages processor cannot be initialized with a null repositories factory");
 
 		if (config == null)
 			throw new IllegalArgumentException("The pages processor cannot be initialized with a null configuration");
 
+		// Makes sure the pages iteration will be from the beginning
+		repositoriesFactory.getPagesRepository().reset();
+
 		int longestPageLength = 0;
-		List<PageProcessingData> pages = repository.retrieveNextPages(PAGES_CHUNK_SIZE);
+		List<PageProcessingData> pages = repositoriesFactory.getPagesRepository().retrieveNextPages(PAGES_CHUNK_SIZE);
 
 		while (pages != null && pages.size() > 0) {
 			// Computes pages count
@@ -51,12 +56,12 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 			processSubdomains(pages, config.getBaseSubdomain());
 
 			// Computes most common elements
-			processMostCommonElements(pages, config);
+			processMostCommonElements(pages, config, repositoriesFactory);
 
 			// Computes longest page
 			longestPageLength = processLongestPage(pages, longestPageLength);
 
-			pages = repository.retrieveNextPages(PAGES_CHUNK_SIZE);
+			pages = repositoriesFactory.getPagesRepository().retrieveNextPages(PAGES_CHUNK_SIZE);
 		}
 	}
 
@@ -111,11 +116,15 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		}
 	}
 
-	private void processMostCommonElements(List<PageProcessingData> pages, PagesProcessorConfiguration config) {
+	private void processMostCommonElements(List<PageProcessingData> pages, PagesProcessorConfiguration config, IRepositoriesFactory repositoriesFactory) throws ClassNotFoundException, SQLException {
+		Map<String, Map<Integer, IndexPosting>> pageIndexPostingData = new HashMap<String, Map<Integer, IndexPosting>>();
+		ArrayList<PageProcessingData> pagesToUpdate = new ArrayList<PageProcessingData>();
+
 		for (PageProcessingData page : pages) {
 			char[] textChars = page.getText().toCharArray();
 			int textLength = textChars.length;
 			int wordStartIndex = -1;
+			int wordPagePosition = 0;			
 			Queue<String> nGramWordsQueue = new LinkedList<String>();
 
 			for (int i = 0; i < textLength; i++) {
@@ -131,7 +140,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 					// to allow the substring method to consider the last
 					// character
 					if (i == textLength - 1) {
-						computeWord(config, page, wordStartIndex, nGramWordsQueue, i + 1);
+						computeWord(config, page, wordStartIndex, i + 1, ++wordPagePosition, nGramWordsQueue, pageIndexPostingData);
 
 						wordStartIndex = -1;
 					}
@@ -140,22 +149,44 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 				// If it hits a non-alphanumerical character and there is a
 				// word's first letter index detected, then we have a word
 				else if (wordStartIndex >= 0) {
-					computeWord(config, page, wordStartIndex, nGramWordsQueue, i);
+					computeWord(config, page, wordStartIndex, i, ++wordPagePosition, nGramWordsQueue, pageIndexPostingData);
 
 					wordStartIndex = -1;
 				}
 			}
+			
+			// If the page is not indexed
+			if (!page.getIndexed()) {
+				// Marks the page as indexed
+				page.setIndexed(true);
+				
+				// Determines the page has to be updated in the repository
+				pagesToUpdate.add(page);
+			}			
+		}
+
+		// If there are pages marked to be updated
+		if (pagesToUpdate.size() > 0) {
+			repositoriesFactory.getPagesRepository().updatePages(pagesToUpdate);
+		
+			List<IndexPosting> postings = new ArrayList<IndexPosting>(pageIndexPostingData.size() * PAGES_CHUNK_SIZE);
+			
+			// Concatenates all postings from the maps buffer
+			pageIndexPostingData.values().forEach(e -> postings.addAll(e.values()));
+			
+			repositoriesFactory.getPostingsRepository().insertPostings(postings);
 		}
 	}
 
-	private void computeWord(PagesProcessorConfiguration config, PageProcessingData page, int wordStartIndex, Queue<String> nGramWordsQueue, int i) {
+	private void computeWord(PagesProcessorConfiguration config, PageProcessingData page, int wordStartIndex, int wordEndIndex, int wordPagePosition, Queue<String> nGramWordsQueue,
+			Map<String, Map<Integer, IndexPosting>> pageIndexPostingData) {
 		// Extract the word from the text and converts it to lower case
-		String word = page.getText().substring(wordStartIndex, i).toLowerCase();
+		String word = page.getText().substring(wordStartIndex, wordEndIndex).toLowerCase();
 
 		// Only considers non stop words
 		if (config.getStopWords() == null || !config.getStopWords().contains(word)) {
 			// Computes word frequency
-			addToMap(mostCommonWords, word);
+			addToMostCommonElementMap(mostCommonWords, word);
 
 			// Computes N-gram frequency
 			// Enqueues the word
@@ -164,15 +195,36 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 			if (nGramWordsQueue.size() == config.getNGramsType()) {
 				String nGram = String.join(" ", nGramWordsQueue);
 
-				addToMap(mostCommonNGrams, nGram);
+				addToMostCommonElementMap(mostCommonNGrams, nGram);
 
 				// Dequeues the first enqueued word
 				nGramWordsQueue.remove();
 			}
+
+			// If the page is not indexed, fills the word index posting data
+			if (page.getIndexed()) {
+				if (!pageIndexPostingData.containsKey(word))
+					pageIndexPostingData.put(word, new HashMap<Integer, IndexPosting>());
+
+				Map<Integer, IndexPosting> postingMap = pageIndexPostingData.get(word);
+				IndexPosting posting;
+
+				if (postingMap.containsKey(page.getId())) {
+					posting = postingMap.get(page.getId());
+
+					posting.incrementWordFrequency();
+					posting.addWordPagePosition(wordPagePosition);
+				} else {
+					posting = new IndexPosting(page.getId());
+				}
+
+				postingMap.put(page.getId(), posting);
+				pageIndexPostingData.put(word, postingMap);
+			}
 		}
 	}
 
-	private void addToMap(Map<String, Integer> map, String key) {
+	private void addToMostCommonElementMap(Map<String, Integer> map, String key) {
 		if (map.containsKey(key))
 			map.put(key, map.get(key) + 1);
 		else

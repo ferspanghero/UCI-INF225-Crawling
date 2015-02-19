@@ -1,10 +1,15 @@
-package searchengine.core;
+package searchengine.core.crawling;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Pattern;
 
+import searchengine.core.PageProcessingData;
+import searchengine.core.repository.IPagesRepository;
+import searchengine.core.repository.IRepositoriesFactory;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
@@ -14,6 +19,12 @@ import edu.uci.ics.crawler4j.url.WebURL;
  * Represents a crawler that visits and collects information about web pages
  */
 public class Crawler extends WebCrawler {
+	public Crawler() {
+		pages = new ArrayList<PageProcessingData>(BATCH_INSERT_LIMIT);
+	}
+	
+	private final static int BATCH_INSERT_LIMIT = 128;
+	private List<PageProcessingData> pages;
 	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|csv|data|java|lif|js|bmp|gif|jpe?g" + "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|ps|ppt|pdf|pde" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
 	private final static Pattern DOMAIN = Pattern.compile("http://.*\\.ics\\.uci\\.edu.*");
 	private IPagesRepository repository;
@@ -22,11 +33,26 @@ public class Crawler extends WebCrawler {
 	public void onStart() {
 		Object data = myController.getCustomData();
 
-		if (!(data instanceof IPagesRepository)) {
-			throw new IllegalArgumentException("The web crawler must be supplied with a valid pages repository");
+		if (!(data instanceof IRepositoriesFactory)) {
+			throw new IllegalArgumentException("The web crawler must be supplied with a valid pages repository factory");
 		}
 
-		repository = (IPagesRepository) data;
+		IRepositoriesFactory repositoriesFactory = (IRepositoriesFactory) data;
+		
+		try {
+			repository = repositoriesFactory.getPagesRepository();
+		} catch (ClassNotFoundException e) {
+			printMessage("Error while creating the pages repository: " + e.getMessage());
+		}
+	}
+	
+	@Override
+	public void onBeforeExit() {
+		if (pages.size() > 1) {
+			insertPages();
+		}
+		
+		super.onBeforeExit();
 	}
 
 	@Override
@@ -64,20 +90,26 @@ public class Crawler extends WebCrawler {
 		if (page.getParseData() instanceof HtmlParseData) {
 			HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 
-			PageProcessingData pageProcessingData = new PageProcessingData(page.getWebURL().getURL(), htmlParseData.getText(), htmlParseData.getHtml());
+			pages.add(new PageProcessingData(page.getWebURL().getURL(), htmlParseData.getText(), htmlParseData.getHtml()));
 
-			printMessage("Crawled " + pageProcessingData.getUrl());
+			printMessage("Crawled " + page.getWebURL().getURL());
 
-			insertPage(pageProcessingData);
+			// If we hit the batch limit, the pages are added to the repository
+			if (pages.size() == BATCH_INSERT_LIMIT) {
+				insertPages();
+			}
 		}
 	}
 
-	private void insertPage(PageProcessingData page) {
+	// TODO: If there is a duplicate in the batch, it will fail. Make sure duplicates are updated in the database instead
+	private void insertPages() {
 		try {
-			repository.insertPage(page);
+			repository.insertPages(pages);
 		} catch (SQLException e) {
-			printMessage("Repository error while inserting " + page.getUrl() + ":" + e.getMessage());
+			printMessage("Repository error while inserting pages: " + e.getMessage());
 		}
+
+		pages.clear();
 	}
 
 	private void printMessage(String message) {

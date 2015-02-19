@@ -16,25 +16,27 @@ import org.junit.Before;
 import org.junit.Test;
 
 import searchengine.core.DefaultPagesProcessor;
-import searchengine.core.IPagesRepository;
 import searchengine.core.PageProcessingData;
 import searchengine.core.PagesProcessorConfiguration;
+import searchengine.core.repository.IPagesRepository;
+import searchengine.core.repository.IRepositoriesFactory;
 
 public class DefaultPagesProcessorTest {
 	private DefaultPagesProcessor processor;
-	private IPagesRepository repository;
+	private IRepositoriesFactory repositoriesFactory;
 	private PagesProcessorConfiguration config;
 	private final static int SAMPLE_PAGES_COUNT = 3;
 	private final static int MOST_COMMON_COUNT = 2;
 	private final static String LONGEST_URL = "http://graphics.ics.uci.edu/about";
 
 	@Before
-	public final void initialize() throws SQLException {
+	public final void initialize() throws SQLException, ClassNotFoundException {
 		processor = new DefaultPagesProcessor();
-		repository = mock(IPagesRepository.class);
+		repositoriesFactory = mock(IRepositoriesFactory.class);
 		config = getTestPageProcessorConfiguration();
 
-		when(repository.retrieveNextPages(anyInt())).thenReturn(getTestPageProcessingData(), null);
+		when(repositoriesFactory.getPagesRepository()).thenReturn(mock(IPagesRepository.class));
+		when(repositoriesFactory.getPagesRepository().retrieveNextPages(anyInt())).thenReturn(getTestPageProcessingData(), null);
 	}
 
 	private PagesProcessorConfiguration getTestPageProcessorConfiguration() {
@@ -60,12 +62,12 @@ public class DefaultPagesProcessorTest {
 	}
 
 	@Test
-	public final void testGetUniquePagesCount() throws SQLException {
+	public final void testGetUniquePagesCount() throws SQLException, ClassNotFoundException {
 		// Arrange
 		int uniquePagesCount;
 
 		// Act
-		processor.processPages(repository, config);
+		processor.processPages(repositoriesFactory, config);
 		uniquePagesCount = processor.getUniquePagesCount();
 
 		// Assert
@@ -73,12 +75,12 @@ public class DefaultPagesProcessorTest {
 	}
 
 	@Test
-	public final void testGetSubdomains() throws SQLException {
+	public final void testGetSubdomains() throws SQLException, ClassNotFoundException {
 		// Arrange
 		Entry<String, Integer>[] subdomains = (Entry<String, Integer>[]) new Entry[2];
 
 		// Act
-		processor.processPages(repository, config);
+		processor.processPages(repositoriesFactory, config);
 		subdomains = processor.getSubdomains().entrySet().toArray(subdomains);
 
 		// Assert		
@@ -89,12 +91,12 @@ public class DefaultPagesProcessorTest {
 	}
 
 	@Test
-	public final void testGetLongestPage() throws SQLException {
+	public final void testGetLongestPage() throws SQLException, ClassNotFoundException {
 		// Arrange
 		String longestPage;
 
 		// Act
-		processor.processPages(repository, config);
+		processor.processPages(repositoriesFactory, config);
 		longestPage = processor.getLongestPage();
 
 		// Assert
@@ -102,12 +104,12 @@ public class DefaultPagesProcessorTest {
 	}
 
 	@Test
-	public final void testGetMostCommonWords() throws SQLException {
+	public final void testGetMostCommonWords() throws SQLException, ClassNotFoundException {
 		// Arrange
 		Entry<String, Integer>[] mostCommonWords = (Entry<String, Integer>[]) new Entry[MOST_COMMON_COUNT];
 
 		// Act
-		processor.processPages(repository, config);
+		processor.processPages(repositoriesFactory, config);
 		mostCommonWords = processor.getMostCommonWords(MOST_COMMON_COUNT).entrySet().toArray(mostCommonWords);
 
 		// Assert
@@ -119,11 +121,11 @@ public class DefaultPagesProcessorTest {
 	}
 
 	@Test
-	public final void testGetMostCommonNGrams() throws SQLException {
+	public final void testGetMostCommonNGrams() throws SQLException, ClassNotFoundException {
 		Entry<String, Integer>[] mostCommonNGrams = (Entry<String, Integer>[]) new Entry[MOST_COMMON_COUNT];
 
 		// Act
-		processor.processPages(repository, config);
+		processor.processPages(repositoriesFactory, config);
 		mostCommonNGrams = processor.getMostCommonNGrams(MOST_COMMON_COUNT).entrySet().toArray(mostCommonNGrams);
 
 		// Assert

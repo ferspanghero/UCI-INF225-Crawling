@@ -7,28 +7,30 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 
-import searchengine.core.CrawlParameters;
-import searchengine.core.Crawler;
-import searchengine.core.CrawlerManager;
-import searchengine.core.ICrawlControllerBuilder;
-import searchengine.core.IPagesRepository;
+import searchengine.core.crawling.CrawlParameters;
+import searchengine.core.crawling.Crawler;
+import searchengine.core.crawling.CrawlerManager;
+import searchengine.core.crawling.ICrawlControllerBuilder;
+import searchengine.core.repository.IPagesRepository;
+import searchengine.core.repository.IRepositoriesFactory;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 
 public class CrawlerManagerTest {
 	private CrawlParameters parameters;
 	private ICrawlControllerBuilder crawlControllerBuilder;
-	private IPagesRepository repository;
+	private IRepositoriesFactory repositoriesFactory;
 	private CrawlController controller;
 	
 	@Before
 	public final void initialize() throws Exception {
 		parameters = mock(CrawlParameters.class);
 		crawlControllerBuilder = mock(ICrawlControllerBuilder.class);
-		repository = mock(IPagesRepository.class);
+		repositoriesFactory = mock(IRepositoriesFactory.class);
 		controller = mock(CrawlController.class);
 		
 		when(parameters.validate()).thenReturn(null);
 		when(crawlControllerBuilder.build(parameters)).thenReturn(controller);
+		when(repositoriesFactory.getPagesRepository()).thenReturn(mock(IPagesRepository.class));
 	}
 
 	@Test
@@ -36,12 +38,12 @@ public class CrawlerManagerTest {
 		CrawlerManager manager = new CrawlerManager();
 		
 		// Act
-		manager.Run(parameters, crawlControllerBuilder, repository, Crawler.class);
+		manager.Run(parameters, crawlControllerBuilder, repositoriesFactory, Crawler.class);
 		
 		// Assert
 		verify(crawlControllerBuilder).build(parameters);		
 		verify(controller).addSeed(parameters.getBaseDomain());
-		verify(controller).setCustomData(repository);
+		verify(controller).setCustomData(repositoriesFactory);
 		verify(controller).start(Crawler.class, parameters.getNumberOfCrawlers());
 	}
 

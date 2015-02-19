@@ -3,6 +3,8 @@ package searchengine.core;
 import java.sql.SQLException;
 import java.util.Map;
 
+import searchengine.core.repository.IRepositoriesFactory;
+
 /**
  * Represents a processor that does a set of operations with the crawled pages
  */
@@ -11,17 +13,15 @@ public interface IPagesProcessor {
 	 * Processes pages retrieved from a repository
 	 * 
 	 * @param config
-	 *            The configuration that should be considered during the
-	 *            processing
-	 * @throws SQLException 
+	 *            The configuration that should be considered during the processing
+	 * 
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
 	 */
 	/*
-	 * The reason for one single process method is efficiency. By doing this, we
-	 * are able to iterate the pages only once and compute all necessary
-	 * information
+	 * The reason for one single process method is efficiency. By doing this, we are able to iterate the pages only once and compute all necessary information
 	 */
-	void processPages(IPagesRepository repository,
-			PagesProcessorConfiguration config) throws SQLException;
+	void processPages(IRepositoriesFactory repositoriesFactory, PagesProcessorConfiguration config) throws SQLException, ClassNotFoundException;
 
 	/**
 	 * Returns the number of unique crawled pages
