@@ -1,11 +1,8 @@
 package searchengine.test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import searchengine.core.crawling.CrawlParameters;
 import searchengine.core.crawling.Crawler;
@@ -23,14 +20,14 @@ public class CrawlerManagerTest {
 	
 	@Before
 	public final void initialize() throws Exception {
-		parameters = mock(CrawlParameters.class);
-		crawlControllerBuilder = mock(ICrawlControllerBuilder.class);
-		repositoriesFactory = mock(IRepositoriesFactory.class);
-		controller = mock(CrawlController.class);
+		parameters = Mockito.mock(CrawlParameters.class);
+		crawlControllerBuilder = Mockito.mock(ICrawlControllerBuilder.class);
+		repositoriesFactory = Mockito.mock(IRepositoriesFactory.class);
+		controller = Mockito.mock(CrawlController.class);
 		
-		when(parameters.validate()).thenReturn(null);
-		when(crawlControllerBuilder.build(parameters)).thenReturn(controller);
-		when(repositoriesFactory.getPagesRepository()).thenReturn(mock(IPagesRepository.class));
+		Mockito.when(parameters.validate()).thenReturn(null);
+		Mockito.when(crawlControllerBuilder.build(parameters)).thenReturn(controller);
+		Mockito.when(repositoriesFactory.getPagesRepository()).thenReturn(Mockito.mock(IPagesRepository.class));
 	}
 
 	@Test
@@ -41,10 +38,10 @@ public class CrawlerManagerTest {
 		manager.Run(parameters, crawlControllerBuilder, repositoriesFactory, Crawler.class);
 		
 		// Assert
-		verify(crawlControllerBuilder).build(parameters);		
-		verify(controller).addSeed(parameters.getBaseDomain());
-		verify(controller).setCustomData(repositoriesFactory);
-		verify(controller).start(Crawler.class, parameters.getNumberOfCrawlers());
+		Mockito.verify(crawlControllerBuilder).build(parameters);		
+		Mockito.verify(controller).addSeed(parameters.getBaseDomain());
+		Mockito.verify(controller).setCustomData(repositoriesFactory);
+		Mockito.verify(controller).start(Crawler.class, parameters.getNumberOfCrawlers());
 	}
 
 }

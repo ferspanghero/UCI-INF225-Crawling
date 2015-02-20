@@ -10,7 +10,9 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import searchengine.core.DefaultIndexBuilder;
 import searchengine.core.DefaultPagesProcessor;
+import searchengine.core.IIndexBuilder;
 import searchengine.core.IPagesProcessor;
 import searchengine.core.PagesProcessorConfiguration;
 import searchengine.core.crawling.CrawlParameters;
@@ -40,6 +42,7 @@ public class Program {
 			int option;
 			final String NOT_PROCESSED_ERROR_MESSAGE = "\nPages must be processed first\n";
 			IRepositoriesFactory repositoriesFactory = new MySQLRepositoriesFactory();
+			IIndexBuilder indexBuilder = new DefaultIndexBuilder();
 			IPagesProcessor processor = null;
 
 			try (Scanner stdin = new Scanner(System.in)) {
@@ -125,6 +128,18 @@ public class Program {
 						}
 						break;
 					}
+					case 8: {
+						long startTime = System.currentTimeMillis();
+
+						indexBuilder.buildIndex(repositoriesFactory);
+
+						long elapsedTime = System.currentTimeMillis() - startTime;
+
+						String formattedElapsedTime = formatElapsedTime(elapsedTime);
+
+						System.out.println("\nIndex built in " + formattedElapsedTime + "\n");
+						break;
+					}
 					}
 				} while (option != 0);
 			}
@@ -132,7 +147,7 @@ public class Program {
 			e.printStackTrace();
 		}
 	}
-
+	
 	private static void printOptions() {
 		System.out.println("(1) - Crawl UCI's domain");
 		System.out.println("(2) - Process crawled pages data");
@@ -141,6 +156,7 @@ public class Program {
 		System.out.println("(5) - Display top " + MOST_FREQUENT_WORDS_COUNT + " most frequent words");
 		System.out.println("(6) - Display top " + MOST_FREQUENT_N_GRAMS_COUNT + " most frequent " + N_GRAM_TYPE + "-grams");
 		System.out.println("(7) - Display subdomains");
+		System.out.println("(8) - Build index");		
 
 		System.out.println("(0) - Exit");
 	}
@@ -194,5 +210,5 @@ public class Program {
 		processor.processPages(repositoriesFactory, new PagesProcessorConfiguration(stopWords, N_GRAM_TYPE, "ics.uci.edu"));
 
 		return processor;
-	}
+	}	
 }

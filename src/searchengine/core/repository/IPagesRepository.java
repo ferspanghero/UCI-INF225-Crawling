@@ -3,7 +3,7 @@ package searchengine.core.repository;
 import java.sql.SQLException;
 import java.util.List;
 
-import searchengine.core.PageProcessingData;
+import searchengine.core.Page;
 
 /**
  * Represents a repository that contains data about the crawled pages
@@ -22,7 +22,7 @@ public interface IPagesRepository {
 	 * 
 	 * @throws SQLException
 	 */
-	List<PageProcessingData> retrieveNextPages(int pagesChunkSize) throws SQLException;
+	List<Page> retrieveNextPages(int pagesChunkSize) throws SQLException;
 
 	/**
 	 * Inserts pages into the repository
@@ -31,7 +31,7 @@ public interface IPagesRepository {
 	 * 
 	 * @return Value indicating if the operation was performed successfully
 	 */
-	int[] insertPages(List<PageProcessingData> pages) throws SQLException;
+	int[] insertPages(List<Page> pages) throws SQLException;
 
 	/**
 	 * Updates pages in the repository
@@ -40,7 +40,7 @@ public interface IPagesRepository {
 	 * 
 	 * @return Value indicating if the operation was performed successfully
 	 */
-	int[] updatePages(List<PageProcessingData> pages) throws SQLException;
+	int[] updatePages(List<Page> pages) throws SQLException;
 
 	/**
 	 * Deletes pages from the repository
@@ -49,7 +49,7 @@ public interface IPagesRepository {
 	 * 
 	 * @return Values indicating if the operations were performed successfully
 	 */
-	int[] deletePages(List<PageProcessingData> pages) throws SQLException;
+	int[] deletePages(List<Page> pages) throws SQLException;
 
 	/**
 	 * Clears the repository

@@ -7,10 +7,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import searchengine.core.PageProcessingData;
+import searchengine.core.Page;
 import searchengine.core.repository.IPagesRepository;
 import searchengine.core.repository.IRepositoriesFactory;
-import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
@@ -20,11 +19,11 @@ import edu.uci.ics.crawler4j.url.WebURL;
  */
 public class Crawler extends WebCrawler {
 	public Crawler() {
-		pages = new ArrayList<PageProcessingData>(BATCH_INSERT_LIMIT);
+		pages = new ArrayList<Page>(BATCH_INSERT_LIMIT);
 	}
 	
 	private final static int BATCH_INSERT_LIMIT = 128;
-	private List<PageProcessingData> pages;
+	private List<Page> pages;
 	private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|csv|data|java|lif|js|bmp|gif|jpe?g" + "|png|tiff?|mid|mp2|mp3|mp4" + "|wav|avi|mov|mpeg|ram|m4v|ps|ppt|pdf|pde" + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
 	private final static Pattern DOMAIN = Pattern.compile("http://.*\\.ics\\.uci\\.edu.*");
 	private IPagesRepository repository;
@@ -86,11 +85,11 @@ public class Crawler extends WebCrawler {
 	 * This function is called when a page is fetched and ready to be processed by your program.
 	 */
 	@Override
-	public void visit(Page page) {
+	public void visit(edu.uci.ics.crawler4j.crawler.Page page) {
 		if (page.getParseData() instanceof HtmlParseData) {
 			HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
 
-			pages.add(new PageProcessingData(page.getWebURL().getURL(), htmlParseData.getText(), htmlParseData.getHtml()));
+			pages.add(new Page(page.getWebURL().getURL(), htmlParseData.getText(), htmlParseData.getHtml()));
 
 			printMessage("Crawled " + page.getWebURL().getURL());
 

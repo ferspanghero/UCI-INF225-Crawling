@@ -9,7 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import searchengine.core.PageProcessingData;
+import searchengine.core.Page;
 
 /**
  * Represents a MySql database that contains data about the crawled pages
@@ -33,8 +33,8 @@ public class MySQLPagesRepository implements IPagesRepository {
 	}
 	
 	@Override
-	public List<PageProcessingData> retrieveNextPages(int pagesChunkSize) throws SQLException {
-		List<PageProcessingData> pages = new ArrayList<PageProcessingData>();
+	public List<Page> retrieveNextPages(int pagesChunkSize) throws SQLException {
+		List<Page> pages = new ArrayList<Page>();
 
 		try (Connection connection = getConnection()) {
 			// ResultSet.TYPE_SCROLL_SENSITIVE tells the driver to consider altered records since the last page was read
@@ -49,7 +49,7 @@ public class MySQLPagesRepository implements IPagesRepository {
 				try (ResultSet resultSet = statement.executeQuery(sql)) {
 					while (resultSet.next()) {
 						// TODO: for this version, the page's HTML content is not being read from the DB
-						PageProcessingData page = new PageProcessingData(resultSet.getString("URL"), resultSet.getString("Text"), "");
+						Page page = new Page(resultSet.getString("URL"), resultSet.getString("Text"), "");
 
 						pages.add(page);
 					}
@@ -63,13 +63,13 @@ public class MySQLPagesRepository implements IPagesRepository {
 	}
 
 	@Override
-	public int[] insertPages(List<PageProcessingData> pages) throws SQLException {
+	public int[] insertPages(List<Page> pages) throws SQLException {
 		int[] updateCounts = null;
 
 		if (pages != null) {
 			try (Connection connection = getConnection()) {
 				try (PreparedStatement statement = connection.prepareStatement("INSERT INTO crawledpages VALUES (?, ?, ?)")) {
-					for (PageProcessingData page : pages) {
+					for (Page page : pages) {
 						statement.setString(1, page.getUrl());
 						statement.setString(2, page.getText());
 						statement.setString(3, page.getHtml());
@@ -86,19 +86,19 @@ public class MySQLPagesRepository implements IPagesRepository {
 	}
 	
 	@Override
-	public int[] updatePages(List<PageProcessingData> pages) throws SQLException {
+	public int[] updatePages(List<Page> pages) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	@Override
-	public int[] deletePages(List<PageProcessingData> pages) throws SQLException {
+	public int[] deletePages(List<Page> pages) throws SQLException {
 		int[] deleteCountArray = null;
 
 		if (pages != null) {
 			try (Connection connection = getConnection()) {
 				try (PreparedStatement statement = connection.prepareStatement("DELETE FROM crawledpages WHERE URL = ?")) {
-					for (PageProcessingData page : pages) {
+					for (Page page : pages) {
 						statement.setString(1, page.getUrl());
 
 						statement.addBatch();

@@ -4,12 +4,12 @@ package searchengine.core;
  * Represents a lightweight version of a Page that only contains relevant
  * processing data
  */
-public class PageProcessingData {
-	public PageProcessingData(String url, String text, String html) {
+public class Page {
+	public Page(String url, String text, String html) {
 		this(-1, url, text, html, false);
 	}
 	
-	public PageProcessingData(int id, String url, String text, String html, Boolean indexed) {
+	public Page(int id, String url, String text, String html, Boolean indexed) {
 		setId(id);
 		setUrl(url);
 		setText(text);

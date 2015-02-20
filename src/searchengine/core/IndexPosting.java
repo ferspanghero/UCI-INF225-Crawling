@@ -11,6 +11,7 @@ public class IndexPosting {
 	public IndexPosting(int pageId) {
 		setPageId(pageId);
 		setWordId(-1);
+		setTfIdf(0);
 
 		wordFrequency = 0;
 		wordPagePositions = new ArrayList<Integer>();
@@ -19,6 +20,7 @@ public class IndexPosting {
 	private int pageId;
 	private int wordId;
 	private int wordFrequency;
+	private double tfIdf;
 	private List<Integer> wordPagePositions;
 
 	public int getPageId() {
@@ -43,6 +45,14 @@ public class IndexPosting {
 
 	public void incrementWordFrequency() {
 		wordFrequency++;
+	}
+	
+	public double getTfIdf() {
+		return tfIdf;
+	}
+
+	public void setTfIdf(double tfIdf) {
+		this.tfIdf = tfIdf;
 	}
 
 	public List<Integer> getWordPagePositions() {

@@ -1,28 +1,26 @@
 package searchengine.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Scanner;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 
 import searchengine.core.DefaultPagesProcessor;
-import searchengine.core.PageProcessingData;
+import searchengine.core.Page;
 import searchengine.core.PagesProcessorConfiguration;
 import searchengine.core.repository.IPagesRepository;
+import searchengine.core.repository.IPostingsRepository;
 import searchengine.core.repository.IRepositoriesFactory;
 
 public class DefaultPagesProcessorTest {
-	private DefaultPagesProcessor processor;
 	private IRepositoriesFactory repositoriesFactory;
 	private PagesProcessorConfiguration config;
 	private final static int SAMPLE_PAGES_COUNT = 3;
@@ -31,12 +29,12 @@ public class DefaultPagesProcessorTest {
 
 	@Before
 	public final void initialize() throws SQLException, ClassNotFoundException {
-		processor = new DefaultPagesProcessor();
-		repositoriesFactory = mock(IRepositoriesFactory.class);
+		repositoriesFactory = Mockito.mock(IRepositoriesFactory.class);
 		config = getTestPageProcessorConfiguration();
 
-		when(repositoriesFactory.getPagesRepository()).thenReturn(mock(IPagesRepository.class));
-		when(repositoriesFactory.getPagesRepository().retrieveNextPages(anyInt())).thenReturn(getTestPageProcessingData(), null);
+		Mockito.when(repositoriesFactory.getPagesRepository()).thenReturn(Mockito.mock(IPagesRepository.class));
+		Mockito.when(repositoriesFactory.getPostingsRepository()).thenReturn(Mockito.mock(IPostingsRepository.class));
+		Mockito.when(repositoriesFactory.getPagesRepository().retrieveNextPages(Matchers.anyInt())).thenReturn(getTestPageProcessingData(), new ArrayList<Page>());
 	}
 
 	private PagesProcessorConfiguration getTestPageProcessorConfiguration() {
@@ -51,19 +49,34 @@ public class DefaultPagesProcessorTest {
 		return new PagesProcessorConfiguration(stopWords, 2, "ics.uci.edu");
 	}
 
-	private List<PageProcessingData> getTestPageProcessingData() {
-		ArrayList<PageProcessingData> pages = new ArrayList<PageProcessingData>();
+	private List<Page> getTestPageProcessingData() {
+		ArrayList<Page> pages = new ArrayList<Page>();
 
-		pages.add(new PageProcessingData("http://www.ics.uci.edu/about/equity/", "A sample text 1", "<html>1</html>"));
-		pages.add(new PageProcessingData("http://www.ics.uci.edu/about/equity/", "A sample text 2", "<html>1</html>"));
-		pages.add(new PageProcessingData("http://graphics.ics.uci.edu/about", "A larger sample here", "<html>1</html>"));
+		pages.add(new Page("http://www.ics.uci.edu/about/equity/", "A sample text 1", "<html>1</html>"));
+		pages.add(new Page("http://www.ics.uci.edu/about/equity/", "A sample text 2", "<html>1</html>"));
+		pages.add(new Page("http://graphics.ics.uci.edu/about", "A larger sample here", "<html>1</html>"));
 
 		return pages;
 	}
 
 	@Test
-	public final void testGetUniquePagesCount() throws SQLException, ClassNotFoundException {
+	public final void testProcess() throws SQLException, ClassNotFoundException {
 		// Arrange
+		DefaultPagesProcessor processor = new DefaultPagesProcessor();
+
+		// Act
+		processor.processPages(repositoriesFactory, config);
+
+		// Assert
+		Mockito.verify(repositoriesFactory.getPagesRepository(), Mockito.times(2)).retrieveNextPages(Matchers.anyInt());
+		Mockito.verify(repositoriesFactory.getPagesRepository(), Mockito.times(1)).updatePages(Matchers.any());
+		Mockito.verify(repositoriesFactory.getPostingsRepository(), Mockito.times(1)).insertPostings(Matchers.any());
+	}
+
+	@Test
+	public final void testGetUniquePagesCount_ProcessFinished() throws SQLException, ClassNotFoundException {
+		// Arrange
+		DefaultPagesProcessor processor = new DefaultPagesProcessor();
 		int uniquePagesCount;
 
 		// Act
@@ -71,28 +84,56 @@ public class DefaultPagesProcessorTest {
 		uniquePagesCount = processor.getUniquePagesCount();
 
 		// Assert
-		assertEquals(uniquePagesCount, SAMPLE_PAGES_COUNT);
+		Assert.assertEquals(uniquePagesCount, SAMPLE_PAGES_COUNT);
 	}
 
 	@Test
-	public final void testGetSubdomains() throws SQLException, ClassNotFoundException {
+	public final void testGetUniquePagesCount_ProcessPending() throws SQLException, ClassNotFoundException {
 		// Arrange
-		Entry<String, Integer>[] subdomains = (Entry<String, Integer>[]) new Entry[2];
+		DefaultPagesProcessor processor = new DefaultPagesProcessor();
+		int uniquePagesCount;
+
+		// Act
+		uniquePagesCount = processor.getUniquePagesCount();
+
+		// Assert
+		Assert.assertTrue(uniquePagesCount == 0);
+	}
+
+	@Test
+	public final void testGetSubdomains_ProcessFinished() throws SQLException, ClassNotFoundException {
+		// Arrange
+		DefaultPagesProcessor processor = new DefaultPagesProcessor();
+		Map<String, Integer> subdomains;
 
 		// Act
 		processor.processPages(repositoriesFactory, config);
-		subdomains = processor.getSubdomains().entrySet().toArray(subdomains);
+		subdomains = processor.getSubdomains();
 
-		// Assert		
-		assertEquals(subdomains[0].getKey(), "http://graphics.ics.uci.edu");
-		assertEquals(subdomains[0].getValue(), new Integer(1));
-		assertEquals(subdomains[1].getKey(), "http://www.ics.uci.edu");
-		assertEquals(subdomains[1].getValue(), new Integer(2));
+		// Assert
+		Assert.assertTrue(subdomains.containsKey("http://graphics.ics.uci.edu"));
+		Assert.assertEquals(subdomains.get("http://graphics.ics.uci.edu"), new Integer(1));
+		Assert.assertTrue(subdomains.containsKey("http://www.ics.uci.edu"));
+		Assert.assertEquals(subdomains.get("http://www.ics.uci.edu"), new Integer(2));
 	}
 
 	@Test
-	public final void testGetLongestPage() throws SQLException, ClassNotFoundException {
+	public final void testGetSubdomains_ProcessPending() throws SQLException, ClassNotFoundException {
 		// Arrange
+		DefaultPagesProcessor processor = new DefaultPagesProcessor();
+		Map<String, Integer> subdomains;
+
+		// Act
+		subdomains = processor.getSubdomains();
+
+		// Assert
+		Assert.assertTrue(subdomains.size() == 0);
+	}
+
+	@Test
+	public final void testGetLongestPage_ProcessFinished() throws SQLException, ClassNotFoundException {
+		// Arrange
+		DefaultPagesProcessor processor = new DefaultPagesProcessor();
 		String longestPage;
 
 		// Act
@@ -100,38 +141,77 @@ public class DefaultPagesProcessorTest {
 		longestPage = processor.getLongestPage();
 
 		// Assert
-		assertEquals(longestPage, LONGEST_URL);
+		Assert.assertEquals(longestPage, LONGEST_URL);
 	}
 
 	@Test
-	public final void testGetMostCommonWords() throws SQLException, ClassNotFoundException {
+	public final void testGetLongestPage_ProcessPending() throws SQLException, ClassNotFoundException {
 		// Arrange
-		Entry<String, Integer>[] mostCommonWords = (Entry<String, Integer>[]) new Entry[MOST_COMMON_COUNT];
+		DefaultPagesProcessor processor = new DefaultPagesProcessor();
+		String longestPage;
 
 		// Act
-		processor.processPages(repositoriesFactory, config);
-		mostCommonWords = processor.getMostCommonWords(MOST_COMMON_COUNT).entrySet().toArray(mostCommonWords);
+		longestPage = processor.getLongestPage();
 
 		// Assert
-		assertEquals(mostCommonWords.length, MOST_COMMON_COUNT);
-		assertEquals(mostCommonWords[0].getKey(), "sample");
-		assertEquals(mostCommonWords[0].getValue(), new Integer(SAMPLE_PAGES_COUNT));
-		assertEquals(mostCommonWords[1].getKey(), "text");
-		assertEquals(mostCommonWords[1].getValue(), new Integer(SAMPLE_PAGES_COUNT - 1));
+		Assert.assertNull(longestPage);
 	}
 
 	@Test
-	public final void testGetMostCommonNGrams() throws SQLException, ClassNotFoundException {
-		Entry<String, Integer>[] mostCommonNGrams = (Entry<String, Integer>[]) new Entry[MOST_COMMON_COUNT];
+	public final void testGetMostCommonWords_ProcessFinished() throws SQLException, ClassNotFoundException {
+		// Arrange
+		DefaultPagesProcessor processor = new DefaultPagesProcessor();
+		Map<String, Integer> mostCommonWords;
 
 		// Act
 		processor.processPages(repositoriesFactory, config);
-		mostCommonNGrams = processor.getMostCommonNGrams(MOST_COMMON_COUNT).entrySet().toArray(mostCommonNGrams);
+		mostCommonWords = processor.getMostCommonWords(MOST_COMMON_COUNT);
 
 		// Assert
-		assertEquals(mostCommonNGrams.length, MOST_COMMON_COUNT);
-		assertEquals(mostCommonNGrams[0].getKey(), "sample text");
-		assertEquals(mostCommonNGrams[0].getValue(), new Integer(SAMPLE_PAGES_COUNT - 1));
+		Assert.assertEquals(mostCommonWords.size(), MOST_COMMON_COUNT);
+		Assert.assertTrue(mostCommonWords.containsKey("sample"));
+		Assert.assertEquals(mostCommonWords.get("sample"), new Integer(SAMPLE_PAGES_COUNT));
+		Assert.assertTrue(mostCommonWords.containsKey("text"));
+		Assert.assertEquals(mostCommonWords.get("text"), new Integer(SAMPLE_PAGES_COUNT - 1));
 	}
 
+	@Test
+	public final void testGetMostCommonWords_ProcessPending() throws SQLException, ClassNotFoundException {
+		// Arrange
+		DefaultPagesProcessor processor = new DefaultPagesProcessor();
+		Map<String, Integer> mostCommonWords;
+
+		// Act
+		mostCommonWords = processor.getMostCommonWords(MOST_COMMON_COUNT);
+
+		// Assert
+		Assert.assertTrue(mostCommonWords.size() == 0);
+	}
+
+	@Test
+	public final void testGetMostCommonNGrams_ProcessFinished() throws SQLException, ClassNotFoundException {
+		DefaultPagesProcessor processor = new DefaultPagesProcessor();
+		Map<String, Integer> mostCommonNGrams;
+
+		// Act
+		processor.processPages(repositoriesFactory, config);
+		mostCommonNGrams = processor.getMostCommonNGrams(MOST_COMMON_COUNT);
+
+		// Assert
+		Assert.assertEquals(mostCommonNGrams.size(), MOST_COMMON_COUNT);
+		Assert.assertTrue(mostCommonNGrams.containsKey("sample text"));
+		Assert.assertEquals(mostCommonNGrams.get("sample text"), new Integer(SAMPLE_PAGES_COUNT - 1));
+	}
+
+	@Test
+	public final void testGetMostCommonNGrams_ProcessPending() throws SQLException, ClassNotFoundException {
+		DefaultPagesProcessor processor = new DefaultPagesProcessor();
+		Map<String, Integer> mostCommonNGrams;
+
+		// Act
+		mostCommonNGrams = processor.getMostCommonNGrams(MOST_COMMON_COUNT);
+
+		// Assert
+		Assert.assertTrue(mostCommonNGrams.size() == 0);
+	}
 }

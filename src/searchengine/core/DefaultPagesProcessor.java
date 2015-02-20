@@ -46,7 +46,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		repositoriesFactory.getPagesRepository().reset();
 
 		int longestPageLength = 0;
-		List<PageProcessingData> pages = repositoriesFactory.getPagesRepository().retrieveNextPages(PAGES_CHUNK_SIZE);
+		List<Page> pages = repositoriesFactory.getPagesRepository().retrieveNextPages(PAGES_CHUNK_SIZE);
 
 		while (pages != null && pages.size() > 0) {
 			// Computes pages count
@@ -96,12 +96,12 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		return Collections.unmodifiableMap(getMapFirstEntries(sortMapByValueDescending(mostCommonNGrams), count));
 	}
 
-	private void processUniquePagesCount(List<PageProcessingData> pages) {
+	private void processUniquePagesCount(List<Page> pages) {
 		pagesCount += pages.size();
 	}
 
-	private void processSubdomains(List<PageProcessingData> pages, String baseSubdomain) {
-		for (PageProcessingData page : pages) {
+	private void processSubdomains(List<Page> pages, String baseSubdomain) {
+		for (Page page : pages) {
 			String url = page.getUrl();
 			String[] urlParts = url.split(baseSubdomain);
 
@@ -116,15 +116,15 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		}
 	}
 
-	private void processMostCommonElements(List<PageProcessingData> pages, PagesProcessorConfiguration config, IRepositoriesFactory repositoriesFactory) throws ClassNotFoundException, SQLException {
+	private void processMostCommonElements(List<Page> pages, PagesProcessorConfiguration config, IRepositoriesFactory repositoriesFactory) throws ClassNotFoundException, SQLException {
 		Map<String, Map<Integer, IndexPosting>> pageIndexPostingData = new HashMap<String, Map<Integer, IndexPosting>>();
-		ArrayList<PageProcessingData> pagesToUpdate = new ArrayList<PageProcessingData>();
+		ArrayList<Page> pagesToUpdate = new ArrayList<Page>();
 
-		for (PageProcessingData page : pages) {
+		for (Page page : pages) {
 			char[] textChars = page.getText().toCharArray();
 			int textLength = textChars.length;
 			int wordStartIndex = -1;
-			int wordPagePosition = 0;			
+			int wordPagePosition = 0;
 			Queue<String> nGramWordsQueue = new LinkedList<String>();
 
 			for (int i = 0; i < textLength; i++) {
@@ -154,31 +154,31 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 					wordStartIndex = -1;
 				}
 			}
-			
+
 			// If the page is not indexed
 			if (!page.getIndexed()) {
 				// Marks the page as indexed
 				page.setIndexed(true);
-				
+
 				// Determines the page has to be updated in the repository
 				pagesToUpdate.add(page);
-			}			
+			}
 		}
 
 		// If there are pages marked to be updated
 		if (pagesToUpdate.size() > 0) {
 			repositoriesFactory.getPagesRepository().updatePages(pagesToUpdate);
-		
+
 			List<IndexPosting> postings = new ArrayList<IndexPosting>(pageIndexPostingData.size() * PAGES_CHUNK_SIZE);
-			
+
 			// Concatenates all postings from the maps buffer
 			pageIndexPostingData.values().forEach(e -> postings.addAll(e.values()));
-			
+
 			repositoriesFactory.getPostingsRepository().insertPostings(postings);
 		}
 	}
 
-	private void computeWord(PagesProcessorConfiguration config, PageProcessingData page, int wordStartIndex, int wordEndIndex, int wordPagePosition, Queue<String> nGramWordsQueue,
+	private void computeWord(PagesProcessorConfiguration config, Page page, int wordStartIndex, int wordEndIndex, int wordPagePosition, Queue<String> nGramWordsQueue,
 			Map<String, Map<Integer, IndexPosting>> pageIndexPostingData) {
 		// Extract the word from the text and converts it to lower case
 		String word = page.getText().substring(wordStartIndex, wordEndIndex).toLowerCase();
@@ -202,7 +202,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 			}
 
 			// If the page is not indexed, fills the word index posting data
-			if (page.getIndexed()) {
+			if (!page.getIndexed()) {
 				if (!pageIndexPostingData.containsKey(word))
 					pageIndexPostingData.put(word, new HashMap<Integer, IndexPosting>());
 
@@ -231,8 +231,8 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 			map.put(key, 1);
 	}
 
-	private int processLongestPage(List<PageProcessingData> pages, int longestPageLength) {
-		for (PageProcessingData page : pages) {
+	private int processLongestPage(List<Page> pages, int longestPageLength) {
+		for (Page page : pages) {
 			if (page.getText().length() > longestPageLength) {
 				longestPageLength = page.getText().length();
 				longestPageUrl = page.getUrl();
