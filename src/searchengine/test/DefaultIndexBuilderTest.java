@@ -38,11 +38,11 @@ public class DefaultIndexBuilderTest {
 	private List<IndexPosting> getTestPostings() {
 		ArrayList<IndexPosting> postings = new ArrayList<IndexPosting>();
 
-		postings.add(new IndexPosting(1, 1, 2, 0, null));
-		postings.add(new IndexPosting(1, 2, 5, 0, null));
-		postings.add(new IndexPosting(1, 3, 10, 0, null));
-		postings.add(new IndexPosting(2, 1, 2, 0, null));
-		postings.add(new IndexPosting(2, 2, 1, 0, null));
+		postings.add(new IndexPosting(1, 1, "word1", 2, 0, null));
+		postings.add(new IndexPosting(1, 2, "word2", 5, 0, null));
+		postings.add(new IndexPosting(1, 3, "word3", 10, 0, null));
+		postings.add(new IndexPosting(2, 1, "word1", 2, 0, null));
+		postings.add(new IndexPosting(2, 2, "word2", 1, 0, null));
 
 		return postings;
 	}
@@ -87,7 +87,7 @@ public class DefaultIndexBuilderTest {
 		for (IndexPosting posting : postings) {
 			double calculatedTfIdf = (posting.getWordFrequency() * pagesCount) / wordsPagesFrequencies.get(posting.getWordId());
 			
-			Assert.assertEquals(posting.getTfIdf(), calculatedTfIdf);
+			Assert.assertEquals(posting.getTfIdf(), calculatedTfIdf, 0d);
 		}
 	}
 }

@@ -45,6 +45,8 @@ public interface IPostingsRepository {
 	
 	/**
 	 * Retrieves how the number of pages each word occurs in
+	 * 
+	 * @return A map where the key is the word repository id and the value is the number of pages this word occurs in
 	 */
 	Map<Integer, Integer> retrieveWordsPagesFrequencies();	
 }

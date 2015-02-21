@@ -8,13 +8,14 @@ import java.util.List;
  * Represents a posting entry from the words index
  */
 public class IndexPosting {
-	public IndexPosting(int pageId) {
-		this(pageId, -1, 0, 0, new ArrayList<Integer>());
+	public IndexPosting(int pageId, String word) {
+		this(pageId, -1, word, 0, 0, new ArrayList<Integer>());
 	}
 	
-	public IndexPosting(int pageId, int wordId, int wordFrequency, double tfIdf, List<Integer> wordPagePositions) {
+	public IndexPosting(int pageId, int wordId, String word, int wordFrequency, double tfIdf, List<Integer> wordPagePositions) {
 		setPageId(pageId);
 		setWordId(wordId);
+		setWord(word);
 		
 		this.wordFrequency = wordFrequency;
 		
@@ -24,6 +25,7 @@ public class IndexPosting {
 
 	private int pageId;
 	private int wordId;
+	private String word;
 	private int wordFrequency;
 	private double tfIdf;
 	private List<Integer> wordPagePositions;
@@ -42,6 +44,14 @@ public class IndexPosting {
 
 	public void setWordId(int wordId) {
 		this.wordId = wordId;
+	}
+	
+	public String getWord() {
+		return word;
+	}
+
+	public void setWord(String word) {
+		this.word = word;
 	}
 
 	public int getWordFrequency() {

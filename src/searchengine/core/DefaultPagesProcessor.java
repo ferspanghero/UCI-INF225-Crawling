@@ -215,7 +215,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 					posting.incrementWordFrequency();
 					posting.addWordPagePosition(wordPagePosition);
 				} else {
-					posting = new IndexPosting(page.getId());
+					posting = new IndexPosting(page.getId(), word);
 				}
 
 				postingMap.put(page.getId(), posting);

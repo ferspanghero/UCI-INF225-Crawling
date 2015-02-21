@@ -45,6 +45,7 @@ public class MySQLPagesRepositoryTest {
 	@Test
 	public void testRetrievePagesCount() {
 		// TODO: Requires implementation
+		Assert.fail();
 	}
 
 	@Test
@@ -63,15 +64,18 @@ public class MySQLPagesRepositoryTest {
 	@Test
 	public void testUpdatePages() {
 		// TODO: Requires implementation
+		Assert.fail();
 	}
 
 	@Test
 	public void testDeletePages() {
 		// TODO: Requires implementation
+		Assert.fail();
 	}
 
 	@Test
 	public void testClearPages() {
 		// TODO: Requires implementation
+		Assert.fail();
 	}
 }
