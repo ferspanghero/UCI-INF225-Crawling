@@ -35,21 +35,59 @@ public class MySQLPagesRepositoryTest {
 
 		// Act
 		repository.insertPages(pages);
-		retrievedPages = repository.retrieveNextPages(2);
+		retrievedPages = repository.retrieveNextPages(3);
 		repository.deletePages(pages);
 
 		// Assert
-		Assert.assertTrue(retrievedPages != null && retrievedPages.size() == 2);
+		Assert.assertTrue(retrievedPages != null && retrievedPages.size() == 3);
 	}
-	
+
 	@Test
-	public void testRetrievePagesCount() {
-		// TODO: Requires implementation
-		Assert.fail();
+	public void testRetrievePagesCount() throws SQLException {
+		// Arrange
+		int pagesCount;
+
+		// Act
+		repository.insertPages(pages);
+		pagesCount = repository.retrievePagesCount();
+		repository.deletePages(pages);
+
+		// Assert
+		Assert.assertTrue(pagesCount >= 3);
 	}
 
 	@Test
 	public void testInsertPages() throws SQLException {
+		// Arrange
+		int[] result;
+
+		// Act
+		result = repository.insertPages(pages);
+		repository.deletePages(pages);
+
+		// Assert
+		Assert.assertTrue(result != null && result.length == pages.size());
+	}
+
+	@Test
+	public void testUpdatePages() throws SQLException {
+		// Arrange
+		int[] result;
+
+		// Act
+		repository.insertPages(pages);
+		
+		pages.forEach(p -> p.setIndexed(true));
+		
+		result = repository.updatePages(pages);
+		repository.deletePages(pages);
+
+		// Assert
+		Assert.assertTrue(result != null && result.length == pages.size());
+	}
+
+	@Test
+	public void testDeletePages() throws SQLException {
 		// Arrange
 		int[] result;
 
@@ -59,23 +97,5 @@ public class MySQLPagesRepositoryTest {
 
 		// Assert
 		Assert.assertTrue(result != null && result.length == pages.size());
-	}
-
-	@Test
-	public void testUpdatePages() {
-		// TODO: Requires implementation
-		Assert.fail();
-	}
-
-	@Test
-	public void testDeletePages() {
-		// TODO: Requires implementation
-		Assert.fail();
-	}
-
-	@Test
-	public void testClearPages() {
-		// TODO: Requires implementation
-		Assert.fail();
 	}
 }

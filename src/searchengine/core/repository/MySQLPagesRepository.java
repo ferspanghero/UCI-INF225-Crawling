@@ -31,7 +31,7 @@ public class MySQLPagesRepository implements IPagesRepository {
 	public void reset() {
 		currentPagesPaginationIndex = 0;
 	}
-	
+
 	@Override
 	public List<Page> retrieveNextPages(int pagesChunkSize) throws SQLException {
 		List<Page> pages = new ArrayList<Page>();
@@ -44,12 +44,12 @@ public class MySQLPagesRepository implements IPagesRepository {
 				statement.setFetchSize(pagesChunkSize);
 				statement.setMaxRows(pagesChunkSize);
 
-				String sql = "SELECT URL, Text FROM crawledpages LIMIT " + currentPagesPaginationIndex + ", " + pagesChunkSize;
+				String sql = "SELECT Id, URL, Text, Indexed FROM pages LIMIT " + currentPagesPaginationIndex + ", " + pagesChunkSize;
 
 				try (ResultSet resultSet = statement.executeQuery(sql)) {
 					while (resultSet.next()) {
 						// TODO: for this version, the page's HTML content is not being read from the DB
-						Page page = new Page(resultSet.getString("URL"), resultSet.getString("Text"), "");
+						Page page = new Page(resultSet.getInt("Id"), resultSet.getString("URL"), resultSet.getString("Text"), "", resultSet.getBoolean("Indexed"));
 
 						pages.add(page);
 					}
@@ -61,11 +61,24 @@ public class MySQLPagesRepository implements IPagesRepository {
 
 		return pages;
 	}
-	
+
 	@Override
-	public int retrievePagesCount() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int retrievePagesCount() throws SQLException {
+		int pagesCount = 0;
+
+		try (Connection connection = getConnection()) {
+			try (Statement statement = connection.createStatement()) {
+
+				String sql = "SELECT COUNT(*) FROM pages";
+
+				try (ResultSet resultSet = statement.executeQuery(sql)) {
+					resultSet.next();
+					pagesCount = resultSet.getInt(1);
+				}
+			}
+		}
+
+		return pagesCount;
 	}
 
 	@Override
@@ -74,11 +87,42 @@ public class MySQLPagesRepository implements IPagesRepository {
 
 		if (pages != null) {
 			try (Connection connection = getConnection()) {
-				try (PreparedStatement statement = connection.prepareStatement("INSERT INTO crawledpages VALUES (?, ?, ?)")) {
+				try (PreparedStatement statement = connection.prepareStatement("INSERT INTO pages (URL, Text, HTML, Indexed) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
 					for (Page page : pages) {
 						statement.setString(1, page.getUrl());
 						statement.setString(2, page.getText());
 						statement.setString(3, page.getHtml());
+						statement.setBoolean(4, page.getIndexed());
+
+						statement.addBatch();
+					}
+
+					updateCounts = statement.executeBatch();
+					
+					// Gets the auto-generated ids from the database and sets to the pages
+					try (ResultSet resultSet = statement.getGeneratedKeys()) {
+						for (Page page : pages) {
+							resultSet.next();
+							page.setId(resultSet.getInt(1));
+						}
+					}
+				}
+			}
+		}
+
+		return updateCounts;
+	}
+
+	@Override
+	public int[] updatePages(List<Page> pages) throws SQLException {
+		int[] updateCounts = null;
+
+		if (pages != null) {
+			try (Connection connection = getConnection()) {
+				try (PreparedStatement statement = connection.prepareStatement("UPDATE pages SET Indexed = ? WHERE Id = ?")) {
+					for (Page page : pages) {
+						statement.setBoolean(1, page.getIndexed());
+						statement.setInt(2, page.getId());
 
 						statement.addBatch();
 					}
@@ -90,22 +134,16 @@ public class MySQLPagesRepository implements IPagesRepository {
 
 		return updateCounts;
 	}
-	
-	@Override
-	public int[] updatePages(List<Page> pages) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
+
 	@Override
 	public int[] deletePages(List<Page> pages) throws SQLException {
 		int[] deleteCountArray = null;
 
 		if (pages != null) {
 			try (Connection connection = getConnection()) {
-				try (PreparedStatement statement = connection.prepareStatement("DELETE FROM crawledpages WHERE URL = ?")) {
+				try (PreparedStatement statement = connection.prepareStatement("DELETE FROM pages WHERE Id = ?")) {
 					for (Page page : pages) {
-						statement.setString(1, page.getUrl());
+						statement.setInt(1, page.getId());
 
 						statement.addBatch();
 					}
@@ -116,21 +154,6 @@ public class MySQLPagesRepository implements IPagesRepository {
 		}
 
 		return deleteCountArray;
-	}
-
-	@Override
-	public int clearPages() throws SQLException {
-		int deleteCount = 0;
-
-		try (Connection connection = getConnection()) {
-			try (Statement statement = connection.createStatement()) {
-				String sql = "DELETE FROM crawledpages";
-
-				deleteCount = statement.executeUpdate(sql);
-			}
-		}
-
-		return deleteCount;
 	}
 
 	private Connection getConnection() throws SQLException {

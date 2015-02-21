@@ -26,8 +26,10 @@ public interface IPagesRepository {
 	
 	/**
 	 * Retrieves the total number of pages in the repository
+	 * 
+	 * @throws SQLException
 	 */
-	int retrievePagesCount();
+	int retrievePagesCount() throws SQLException;
 
 	/**
 	 * Inserts pages into the repository
@@ -55,13 +57,4 @@ public interface IPagesRepository {
 	 * @return Values indicating if the operations were performed successfully
 	 */
 	int[] deletePages(List<Page> pages) throws SQLException;
-
-	/**
-	 * Clears the repository
-	 * 
-	 * @throws SQLException
-	 * 
-	 * @return Value indicating if the operation was performed successfully
-	 */
-	int clearPages() throws SQLException;
 }
