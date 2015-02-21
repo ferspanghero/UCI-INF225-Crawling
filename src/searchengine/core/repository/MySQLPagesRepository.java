@@ -49,7 +49,7 @@ public class MySQLPagesRepository implements IPagesRepository {
 				try (ResultSet resultSet = statement.executeQuery(sql)) {
 					while (resultSet.next()) {
 						// TODO: for this version, the page's HTML content is not being read from the DB
-						Page page = new Page(resultSet.getInt("Id"), resultSet.getString("URL"), resultSet.getString("Text"), "", resultSet.getBoolean("Indexed"));
+						Page page = new Page(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), "", resultSet.getBoolean(4));
 
 						pages.add(page);
 					}
@@ -160,6 +160,6 @@ public class MySQLPagesRepository implements IPagesRepository {
 		// TODO: make connection parameters configurable
 		// useServerPrepStmts=false tells MySQL to handle server-side prepared statements locally
 		// rewriteBatchedStatements=true tells MySQL to pack as many queries as possible into a single network packet
-		return DriverManager.getConnection("jdbc:mysql://localhost:3306/ucicrawling?user=root&password=password&useServerPrepStmts=false&rewriteBatchedStatements=true");
+		return DriverManager.getConnection("jdbc:mysql://localhost:3306/ucicrawling?user=root&password=password&useServerPrepStmts=false&rewriteBatchedStatements=true&useUnicode=true&characterEncoding=UTF-8");
 	}
 }

@@ -27,7 +27,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		mostCommonNGrams = new HashMap<String, Integer>();
 	}
 
-	private final static int PAGES_CHUNK_SIZE = 128;
+	private final static int PAGES_CHUNK_SIZE = 1;
 	private int pagesCount;
 	private String longestPageUrl;
 	private HashMap<String, Integer> subdomainsCount;
@@ -166,15 +166,15 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		}
 
 		// If there are pages marked to be updated
-		if (pagesToUpdate.size() > 0) {
-			repositoriesFactory.getPagesRepository().updatePages(pagesToUpdate);
-
+		if (pagesToUpdate.size() > 0) {			
 			List<IndexPosting> postings = new ArrayList<IndexPosting>(pageIndexPostingData.size() * PAGES_CHUNK_SIZE);
 
 			// Concatenates all postings from the maps buffer
 			pageIndexPostingData.values().forEach(e -> postings.addAll(e.values()));
 
+			// TODO: The two operations below should be contained within a single transaction					
 			repositoriesFactory.getPostingsRepository().insertPostings(postings);
+			repositoriesFactory.getPagesRepository().updatePages(pagesToUpdate);
 		}
 	}
 
@@ -211,13 +211,14 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 
 				if (postingMap.containsKey(page.getId())) {
 					posting = postingMap.get(page.getId());
-
-					posting.incrementWordFrequency();
+					
 					posting.addWordPagePosition(wordPagePosition);
 				} else {
 					posting = new IndexPosting(page.getId(), word);
 				}
 
+				posting.incrementWordFrequency();
+				
 				postingMap.put(page.getId(), posting);
 				pageIndexPostingData.put(word, postingMap);
 			}

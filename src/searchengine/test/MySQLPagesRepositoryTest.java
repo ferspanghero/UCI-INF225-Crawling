@@ -13,7 +13,7 @@ import searchengine.core.repository.IPagesRepository;
 import searchengine.core.repository.MySQLPagesRepository;
 
 // TODO: rewrite this class so that tests are not strongly coupled to the DB as they are for now
-// TODO: this needs more tests when mock is available (reset scenario, many batch inserts and reads, clear, etc.)
+// TODO: this needs more tests (reset scenario, many batch inserts and reads, etc.)
 public class MySQLPagesRepositoryTest {
 	private IPagesRepository repository;
 	private List<Page> pages;

@@ -9,10 +9,10 @@ import java.util.List;
  */
 public class IndexPosting {
 	public IndexPosting(int pageId, String word) {
-		this(pageId, -1, word, 0, 0, new ArrayList<Integer>());
+		this(pageId, -1, word, 0, 0);
 	}
 	
-	public IndexPosting(int pageId, int wordId, String word, int wordFrequency, double tfIdf, List<Integer> wordPagePositions) {
+	public IndexPosting(int pageId, int wordId, String word, int wordFrequency, double tfIdf) {
 		setPageId(pageId);
 		setWordId(wordId);
 		setWord(word);
@@ -20,7 +20,7 @@ public class IndexPosting {
 		this.wordFrequency = wordFrequency;
 		
 		setTfIdf(tfIdf);
-		this.wordPagePositions = wordPagePositions;
+		this.wordPagePositions = new ArrayList<Integer>();
 	}
 
 	private int pageId;

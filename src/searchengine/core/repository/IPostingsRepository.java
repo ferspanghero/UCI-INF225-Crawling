@@ -20,7 +20,7 @@ public interface IPostingsRepository {
 	 * 
 	 * @param postingsChunkSize
 	 *            Determines the number of postings that should be retrieved
-	 *            
+	 * 
 	 * @throws SQLException
 	 */
 	List<IndexPosting> retrieveNextPostings(int postingsChunkSize) throws SQLException;
@@ -32,7 +32,7 @@ public interface IPostingsRepository {
 	 * 
 	 * @return Value indicating if the operation was performed successfully
 	 */
-	int[] insertPostings(List<IndexPosting> postings) throws SQLException;
+	int insertPostings(List<IndexPosting> postings) throws SQLException;
 
 	/**
 	 * Updates postings into the repository
@@ -42,11 +42,22 @@ public interface IPostingsRepository {
 	 * @return Value indicating if the operation was performed successfully
 	 */
 	int[] updatePostings(List<IndexPosting> postings) throws SQLException;
-	
+
+	/**
+	 * Deletes postings from the repository
+	 * 
+	 * @throws SQLException
+	 * 
+	 * @return Values indicating if the operations were performed successfully
+	 */
+	int[] deletePostings(List<IndexPosting> postings) throws SQLException;
+
 	/**
 	 * Retrieves how the number of pages each word occurs in
 	 * 
 	 * @return A map where the key is the word repository id and the value is the number of pages this word occurs in
+	 * 
+	 * @throws SQLException
 	 */
-	Map<Integer, Integer> retrieveWordsPagesFrequencies();	
+	Map<Integer, Integer> retrieveWordsPagesFrequencies() throws SQLException;
 }
