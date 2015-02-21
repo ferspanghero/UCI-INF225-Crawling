@@ -10,9 +10,19 @@ public class MySQLPostingsRepositoryTest {
 	public void testInsertPostings() {
 		// TODO: Requires implementation
 	}
+	
+	@Test
+	public void testUpdatePostings() {
+		// TODO: Requires implementation
+	}
 
 	@Test
 	public void testRetrievePostings() {
+		// TODO: Requires implementation
+	}
+	
+	@Test
+	public void testRetrieveWordsPagesFrequencies() {
 		// TODO: Requires implementation
 	}
 }

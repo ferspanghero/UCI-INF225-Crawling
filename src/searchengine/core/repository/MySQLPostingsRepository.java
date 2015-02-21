@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import searchengine.core.IndexPosting;
 
@@ -36,6 +37,18 @@ public class MySQLPostingsRepository implements IPostingsRepository {
 
 	@Override
 	public int[] insertPostings(List<IndexPosting> postings) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public int[] updatePostings(List<IndexPosting> postings) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public Map<Integer, Integer> retrieveWordsPagesFrequencies() {
 		// TODO Auto-generated method stub
 		return null;
 	}

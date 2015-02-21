@@ -20,6 +20,7 @@ import searchengine.core.repository.IPagesRepository;
 import searchengine.core.repository.IPostingsRepository;
 import searchengine.core.repository.IRepositoriesFactory;
 
+// TODO: Test edge cases (repository is null, pages are empty, etc.)
 public class DefaultPagesProcessorTest {
 	private IRepositoriesFactory repositoriesFactory;
 	private PagesProcessorConfiguration config;
@@ -68,6 +69,7 @@ public class DefaultPagesProcessorTest {
 		processor.processPages(repositoriesFactory, config);
 
 		// Assert
+		Mockito.verify(repositoriesFactory.getPagesRepository(), Mockito.times(1)).reset();
 		Mockito.verify(repositoriesFactory.getPagesRepository(), Mockito.times(2)).retrieveNextPages(Matchers.anyInt());
 		Mockito.verify(repositoriesFactory.getPagesRepository(), Mockito.times(1)).updatePages(Matchers.any());
 		Mockito.verify(repositoriesFactory.getPostingsRepository(), Mockito.times(1)).insertPostings(Matchers.any());

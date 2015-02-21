@@ -61,6 +61,12 @@ public class MySQLPagesRepository implements IPagesRepository {
 
 		return pages;
 	}
+	
+	@Override
+	public int retrievePagesCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 	@Override
 	public int[] insertPages(List<Page> pages) throws SQLException {

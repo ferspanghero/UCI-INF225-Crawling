@@ -2,6 +2,7 @@ package searchengine.core.repository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import searchengine.core.IndexPosting;
 
@@ -32,4 +33,18 @@ public interface IPostingsRepository {
 	 * @return Value indicating if the operation was performed successfully
 	 */
 	int[] insertPostings(List<IndexPosting> postings) throws SQLException;
+
+	/**
+	 * Updates postings into the repository
+	 * 
+	 * @throws SQLException
+	 * 
+	 * @return Value indicating if the operation was performed successfully
+	 */
+	int[] updatePostings(List<IndexPosting> postings) throws SQLException;
+	
+	/**
+	 * Retrieves how the number of pages each word occurs in
+	 */
+	Map<Integer, Integer> retrieveWordsPagesFrequencies();	
 }

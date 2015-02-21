@@ -1,5 +1,7 @@
 package searchengine.core;
 
+import java.sql.SQLException;
+
 import searchengine.core.repository.IRepositoriesFactory;
 
 /**
@@ -8,6 +10,9 @@ import searchengine.core.repository.IRepositoriesFactory;
 public interface IIndexBuilder {
 	/**
 	 * Builds the pages term index
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException 
 	 */
-	void buildIndex(IRepositoriesFactory repositoriesFactory);
+	void buildIndex(IRepositoriesFactory repositoriesFactory) throws ClassNotFoundException, SQLException;
 }
