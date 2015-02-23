@@ -27,7 +27,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		mostCommonNGrams = new HashMap<String, Integer>();
 	}
 
-	private final static int PAGES_CHUNK_SIZE = 1;
+	private final static int PAGES_CHUNK_SIZE = 128;
 	private int pagesCount;
 	private String longestPageUrl;
 	private HashMap<String, Integer> subdomainsCount;
@@ -183,8 +183,9 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		// Extract the word from the text and converts it to lower case
 		String word = page.getText().substring(wordStartIndex, wordEndIndex).toLowerCase();
 
-		// Only considers non stop words
-		if (config.getStopWords() == null || !config.getStopWords().contains(word)) {
+		// Only considers non stop words and ignore overly long words
+		// TODO: Include the word length in the configuration
+		if ((config.getStopWords() == null || !config.getStopWords().contains(word)) && word.length() < 256) {
 			// Computes word frequency
 			addToMostCommonElementMap(mostCommonWords, word);
 
