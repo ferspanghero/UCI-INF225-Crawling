@@ -23,11 +23,17 @@ public class MySQLPostingsRepository implements IPostingsRepository {
 		Class.forName("com.mysql.jdbc.Driver");
 
 		reset();
+		
+		wordsIdsCache = new HashMap<String, Integer>();
 	}
 
 	// Since the database records are read in chunks (or pages), determines the
 	// current posting that will be read
 	private int currentPostingsPaginationIndex;
+	
+	// Caches the recently inserted words ids to diminish the number of reads in the database
+	// TODO: this cache is not thread-safe
+	private Map<String, Integer> wordsIdsCache;
 
 	@Override
 	public void reset() {
@@ -89,16 +95,14 @@ public class MySQLPostingsRepository implements IPostingsRepository {
 
 		if (postings != null) {
 			try (Connection connection = getConnection()) {
-				try {
-					Map<String, Integer> wordsIdsMap = new HashMap<String, Integer>();
-
+				try {					
 					connection.setAutoCommit(false);
 
 					try (PreparedStatement insertWordsPagesPositionsStatement = connection.prepareStatement("INSERT INTO wordspagespositions (WordId, PageId, Position) VALUES (?, ?, ?)")) {
 						try (PreparedStatement insertWordsPagesStatement = connection.prepareStatement("INSERT INTO wordspages (WordId, PageId, Frequency, TFIDF) VALUES (?, ?, ?, ?)")) {
 							for (IndexPosting posting : postings) {
 								// If the word id is present in the map, it has already been inserted into the database
-								if (!wordsIdsMap.containsKey(posting.getWord())) {
+								if (!wordsIdsCache.containsKey(posting.getWord())) {
 									try (PreparedStatement selectWordStatement = connection.prepareStatement("SELECT Id, Word FROM words WHERE word = ?")) {
 										selectWordStatement.setString(1, posting.getWord());
 
@@ -108,7 +112,7 @@ public class MySQLPostingsRepository implements IPostingsRepository {
 											if (selectWordResultSet.next()) {
 												int currentWordId = selectWordResultSet.getInt(1);
 												posting.setWordId(currentWordId);
-												wordsIdsMap.put(posting.getWord(), currentWordId);
+												wordsIdsCache.put(posting.getWord(), currentWordId);
 											} else {
 												// Inserts the word in the database if it was not found
 												try (PreparedStatement insertWordStatement = connection.prepareStatement("INSERT INTO words (Word) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
@@ -124,14 +128,14 @@ public class MySQLPostingsRepository implements IPostingsRepository {
 
 														int currentWordId = insertWordResultSet.getInt(1);
 														posting.setWordId(currentWordId);
-														wordsIdsMap.put(posting.getWord(), currentWordId);
+														wordsIdsCache.put(posting.getWord(), currentWordId);
 													}
 												}
 											}
 										}
 									}
 								} else {
-									posting.setWordId(wordsIdsMap.get(posting.getWord()));
+									posting.setWordId(wordsIdsCache.get(posting.getWord()));
 								}
 
 								insertWordsPagesStatement.setInt(1, posting.getWordId());
@@ -206,6 +210,11 @@ public class MySQLPostingsRepository implements IPostingsRepository {
 					}
 
 					deleteCountArray = statement.executeBatch();
+					
+					// If the delete was successful, removes words ids from the cache
+					for (IndexPosting posting : postings) {
+						wordsIdsCache.remove(posting.getWordId());
+					}
 				}
 			}
 		}

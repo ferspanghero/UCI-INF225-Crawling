@@ -27,7 +27,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		mostCommonNGrams = new HashMap<String, Integer>();
 	}
 
-	private final static int PAGES_CHUNK_SIZE = 128;
+	private final static int PAGES_CHUNK_SIZE = 64;
 	private int pagesCount;
 	private String longestPageUrl;
 	private HashMap<String, Integer> subdomainsCount;
@@ -120,40 +120,14 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		Map<String, Map<Integer, IndexPosting>> pageIndexPostingData = new HashMap<String, Map<Integer, IndexPosting>>();
 		ArrayList<Page> pagesToUpdate = new ArrayList<Page>();
 
-		for (Page page : pages) {
-			char[] textChars = page.getText().toCharArray();
-			int textLength = textChars.length;
-			int wordStartIndex = -1;
+		for (Page page : pages) {			
 			int wordPagePosition = 0;
 			Queue<String> nGramWordsQueue = new LinkedList<String>();
-
-			for (int i = 0; i < textLength; i++) {
-				// Only considers alphanumerical characters as valid for terms
-				if (Character.isLetterOrDigit(textChars[i])) {
-					// Stores the word's first letter index
-					if (wordStartIndex < 0)
-						wordStartIndex = i;
-
-					// If it reads the last character of the page and it is
-					// alphanumerical, then we have a word
-					// OBS: It is necessary to increment the current index + 1
-					// to allow the substring method to consider the last
-					// character
-					if (i == textLength - 1) {
-						computeWord(config, page, wordStartIndex, i + 1, ++wordPagePosition, nGramWordsQueue, pageIndexPostingData);
-
-						wordStartIndex = -1;
-					}
-				}
-
-				// If it hits a non-alphanumerical character and there is a
-				// word's first letter index detected, then we have a word
-				else if (wordStartIndex >= 0) {
-					computeWord(config, page, wordStartIndex, i, ++wordPagePosition, nGramWordsQueue, pageIndexPostingData);
-
-					wordStartIndex = -1;
-				}
-			}
+			Tokenizer tokenizer = new Tokenizer(page.getText());
+			
+			while (tokenizer.processNextToken()) {
+				computeWord(config, page, tokenizer.getCurrentToken(), ++wordPagePosition, nGramWordsQueue, pageIndexPostingData);
+			}					
 
 			// If the page is not indexed
 			if (!page.getIndexed()) {
@@ -166,26 +140,22 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 		}
 
 		// If there are pages marked to be updated
-		if (pagesToUpdate.size() > 0) {			
+		if (pagesToUpdate.size() > 0) {
 			List<IndexPosting> postings = new ArrayList<IndexPosting>(pageIndexPostingData.size() * PAGES_CHUNK_SIZE);
 
 			// Concatenates all postings from the maps buffer
 			pageIndexPostingData.values().forEach(e -> postings.addAll(e.values()));
 
-			// TODO: The two operations below should be contained within a single transaction					
+			// TODO: The two operations below should be contained within a single transaction
 			repositoriesFactory.getPostingsRepository().insertPostings(postings);
 			repositoriesFactory.getPagesRepository().updatePages(pagesToUpdate);
 		}
 	}
 
-	private void computeWord(PagesProcessorConfiguration config, Page page, int wordStartIndex, int wordEndIndex, int wordPagePosition, Queue<String> nGramWordsQueue,
-			Map<String, Map<Integer, IndexPosting>> pageIndexPostingData) {
-		// Extract the word from the text and converts it to lower case
-		String word = page.getText().substring(wordStartIndex, wordEndIndex).toLowerCase();
-
+	private void computeWord(PagesProcessorConfiguration config, Page page, String word, int wordPagePosition, Queue<String> nGramWordsQueue, Map<String, Map<Integer, IndexPosting>> pageIndexPostingData) {		
 		// Only considers non stop words and ignore overly long words
-		// TODO: Include the word length in the configuration
-		if ((config.getStopWords() == null || !config.getStopWords().contains(word)) && word.length() < 256) {
+		// TODO: Include the word min/max length in the configuration/
+		if ((config.getStopWords() == null || !config.getStopWords().contains(word)) && word.length() > 2 && word.length() < 64) {
 			// Computes word frequency
 			addToMostCommonElementMap(mostCommonWords, word);
 
@@ -210,16 +180,10 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 				Map<Integer, IndexPosting> postingMap = pageIndexPostingData.get(word);
 				IndexPosting posting;
 
-				if (postingMap.containsKey(page.getId())) {
-					posting = postingMap.get(page.getId());
-					
-					posting.addWordPagePosition(wordPagePosition);
-				} else {
-					posting = new IndexPosting(page.getId(), word);
-				}
-
+				posting = postingMap.containsKey(page.getId()) ? postingMap.get(page.getId()) : new IndexPosting(page.getId(), word); 
 				posting.incrementWordFrequency();
-				
+				posting.addWordPagePosition(wordPagePosition);
+
 				postingMap.put(page.getId(), posting);
 				pageIndexPostingData.put(word, postingMap);
 			}
