@@ -10,7 +10,7 @@ import searchengine.core.repository.IRepositoriesFactory;
  * Represents a basic builder of the pages terms index
  */
 public class DefaultIndexBuilder implements IIndexBuilder {
-	private final static int POSTINGS_CHUNK_SIZE = 1024;
+	private final static int POSTINGS_CHUNK_SIZE = 2048;
 
 	@Override
 	public void buildIndex(IRepositoriesFactory repositoriesFactory) throws ClassNotFoundException, SQLException {
@@ -30,8 +30,11 @@ public class DefaultIndexBuilder implements IIndexBuilder {
 
 				while (postings != null && postings.size() > 0) {
 					for (IndexPosting posting : postings) {
-						// Calculates the TF-IDF through the formula: (wordFrequencyInPageN * totalNumberOfPages) / totalNumberOfPagesWordOcurrsIn
-						posting.setTfIdf((posting.getWordFrequency() * pagesCount) / wordsPagesFrequencies.get(posting.getWordId()));
+						// Calculates the TF-IDF through the formula: (1 + log10(wordFrequencyInPageN) * (log10(totalNumberOfPages / totalNumberOfPagesWordOcurrsIn))
+						double tf = posting.getWordFrequency() == 0 ? 0 : 1 + Math.log10(posting.getWordFrequency());
+						double idf = Math.log10(pagesCount / wordsPagesFrequencies.get(posting.getWordId()));
+						
+						posting.setTfIdf(tf * idf);
 					}
 
 					repositoriesFactory.getPostingsRepository().updatePostings(postings);
