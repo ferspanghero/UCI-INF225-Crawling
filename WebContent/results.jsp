@@ -24,8 +24,7 @@
 
 <style type="text/css">
 #searchResultsRow {
-
-min-height: 80%;
+	min-height: 80%;
 }
 
 #searchResults {
@@ -42,9 +41,8 @@ min-height: 80%;
 }
 
 .li {
-font-size: 16px;
-padding: 5px 5px;
-
+	font-size: 16px;
+	padding: 5px 5px;
 }
 
 .tftextinput {
@@ -110,28 +108,28 @@ padding: 5px 5px;
 							<a href="index.html">ICS Search Engine </a>
 						</h1>
 						<input type="text" class="tftextinput" name="q" size="65"
-							maxlength="120" value="${query} " /><input
-							type="submit" value="search" class="tfbutton">
+							maxlength="120" value="${query} " /><input type="submit"
+							value="search" class="tfbutton">
 					</form>
 					<div class="tfclear"></div>
 				</div>
 				<hr>
 			</div>
-			
+
 			<!-- This is where all of our search results will be placed -->
 			<div class="row" id="searchResultsRow">
-			<ol type="1" start="${listStart}" id="searchResults">
+				<ol type="1" start="${listStart}" id="searchResults">
 					<c:forEach var="url" items="${listData}">
-					<li><a href="${url}">${url}</a></li>
+						<li><a href="${url}">${url}</a></li>
 					</c:forEach>
-			</ol>
-			<br>
-			<hr>
+				</ol>
+				<br>
+				<hr>
 			</div>
-			
+
 			<!-- The rest of this is just pagination on the bottom -->
 			<div class="row">
-			
+
 				<%-- Display next link except for first page --%>
 				<c:if test="${currentPage != 1}">
 					<td><a href="search?page=${currentPage - 1}">Previous</a></td>
@@ -142,26 +140,27 @@ padding: 5px 5px;
 					<tr>
 						<c:forEach begin="1" end="${numOfPages}" var="i">
 							<c:if test="${(i mod 30) eq 1 and i > 1}">
-							</tr><tr>
-							</c:if>
-							<c:choose>
-								<c:when test="${currentPage eq i}">
-									<td>${i}</td>
-								</c:when>
-								<c:otherwise>
-									<td><a href="search?page=${i}">${i}</a></td>
-								</c:otherwise>
-							</c:choose>
+					</tr>
+					<tr>
+						</c:if>
+						<c:choose>
+							<c:when test="${currentPage eq i}">
+								<td>${i}</td>
+							</c:when>
+							<c:otherwise>
+								<td><a href="search?page=${i}">${i}</a></td>
+							</c:otherwise>
+						</c:choose>
 						</c:forEach>
 					</tr>
 				</table>
-				
-				    <%--For displaying Next link --%>
-    <c:if test="${currentPage lt numOfPages}">
-        <td><a href="search?page=${currentPage + 1}">Next</a></td>
-    </c:if>
-    <br>
-    <hr>
+
+				<%--For displaying Next link --%>
+				<c:if test="${currentPage lt numOfPages}">
+					<td><a href="search?page=${currentPage + 1}">Next</a></td>
+				</c:if>
+				<br>
+				<hr>
 
 
 			</div>
