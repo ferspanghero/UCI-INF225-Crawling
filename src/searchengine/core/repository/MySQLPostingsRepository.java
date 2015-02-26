@@ -1,5 +1,6 @@
 package searchengine.core.repository;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -221,30 +222,20 @@ public class MySQLPostingsRepository implements IPostingsRepository {
 
 		return deleteCountArray;
 	}
-
+	
 	@Override
-	public Map<Integer, Integer> retrieveWordsPagesFrequencies() throws SQLException {
-		Map<Integer, Integer> wordsPagesFrequencies = new HashMap<Integer, Integer>();
-
+	public void calculatePostingsRankingScore() throws SQLException {
 		try (Connection connection = getConnection()) {
-			try (Statement statement = connection.createStatement()) {
-				String sql = "SELECT WordId, COUNT(*) FROM wordspages GROUP BY WordId";
-
-				try (ResultSet resultSet = statement.executeQuery(sql)) {
-					while (resultSet.next()) {
-						wordsPagesFrequencies.put(resultSet.getInt(1), resultSet.getInt(2));
-					}
-				}
+			try (CallableStatement statement = connection.prepareCall("call calculatePostingsRankingScore")) {
+				statement.execute();
 			}
 		}
-
-		return wordsPagesFrequencies;
 	}
-
+	
 	private Connection getConnection() throws SQLException {
 		// TODO: make connection parameters configurable
 		// useServerPrepStmts=false tells MySQL to handle server-side prepared statements locally
 		// rewriteBatchedStatements=true tells MySQL to pack as many queries as possible into a single network packet
 		return DriverManager.getConnection("jdbc:mysql://localhost:3306/ucicrawling?user=root&password=password&useServerPrepStmts=false&rewriteBatchedStatements=true&useUnicode=true&characterEncoding=UTF-8");
-	}
+	}	
 }

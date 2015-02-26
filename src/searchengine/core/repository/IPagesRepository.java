@@ -23,14 +23,7 @@ public interface IPagesRepository {
 	 * @throws SQLException
 	 */
 	List<Page> retrieveNextPages(int pagesChunkSize) throws SQLException;
-	
-	/**
-	 * Retrieves the total number of pages in the repository
-	 * 
-	 * @throws SQLException
-	 */
-	int retrievePagesCount() throws SQLException;
-
+		
 	/**
 	 * Inserts pages into the repository
 	 * 

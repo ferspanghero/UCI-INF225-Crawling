@@ -23,5 +23,6 @@
 	<classpathentry kind="lib" path="lib/tagsoup-1.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/tika-core-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/tika-parsers-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Fernando/Desktop/eclipse/workspace/SearchEngine/lib/org.tartarus.snowball.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

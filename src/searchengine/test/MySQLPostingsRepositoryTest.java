@@ -3,7 +3,6 @@ package searchengine.test;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -138,18 +137,10 @@ public class MySQLPostingsRepositoryTest {
 		// Assert
 		Assert.assertTrue(result != null && result.length == postings.size());
 	}
-
+	
 	@Test
-	public void testRetrieveWordsPagesFrequencies() throws SQLException {
-		// Arrange
-		Map<Integer, Integer> wordsPagesFrequencies;
-
-		// Act
-		postingsRepository.insertPostings(postings);
-		wordsPagesFrequencies = postingsRepository.retrieveWordsPagesFrequencies();
-		postingsRepository.deletePostings(postings);
-
-		// Assert
-		Assert.assertTrue(wordsPagesFrequencies != null && wordsPagesFrequencies.size() == 2);		
+	public void testCalculateRankingsScore() throws SQLException {
+		// TODO: requires implementation
+		Assert.fail();
 	}
 }
