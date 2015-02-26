@@ -28,6 +28,7 @@ public class DefaultPagesProcessorTest {
 	private final static int MOST_COMMON_COUNT = 2;
 	private final static String LONGEST_URL = "http://graphics.ics.uci.edu/about";
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public final void initialize() throws SQLException, ClassNotFoundException {
 		repositoriesFactory = Mockito.mock(IRepositoriesFactory.class);
