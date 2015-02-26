@@ -34,5 +34,6 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Fernando/Desktop/eclipse/workspace/SearchEngine/lib/org.tartarus.snowball.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

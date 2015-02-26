@@ -50,14 +50,12 @@ public interface IPostingsRepository {
 	 * 
 	 * @return Values indicating if the operations were performed successfully
 	 */
-	int[] deletePostings(List<IndexPosting> postings) throws SQLException;
-
+	int[] deletePostings(List<IndexPosting> postings) throws SQLException;	
+	
 	/**
-	 * Retrieves how the number of pages each word occurs in
-	 * 
-	 * @return A map where the key is the word repository id and the value is the number of pages this word occurs in
+	 * Calculates the ranking scores of all index postings
 	 * 
 	 * @throws SQLException
 	 */
-	Map<Integer, Integer> retrieveWordsPagesFrequencies() throws SQLException;
+	void calculatePostingsRankingScore() throws SQLException;
 }

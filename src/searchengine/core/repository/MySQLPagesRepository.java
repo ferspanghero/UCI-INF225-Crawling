@@ -63,25 +63,6 @@ public class MySQLPagesRepository implements IPagesRepository {
 	}
 
 	@Override
-	public int retrievePagesCount() throws SQLException {
-		int pagesCount = 0;
-
-		try (Connection connection = getConnection()) {
-			try (Statement statement = connection.createStatement()) {
-
-				String sql = "SELECT COUNT(*) FROM pages";
-
-				try (ResultSet resultSet = statement.executeQuery(sql)) {
-					resultSet.next();
-					pagesCount = resultSet.getInt(1);
-				}
-			}
-		}
-
-		return pagesCount;
-	}
-
-	@Override
 	public int[] insertPages(List<Page> pages) throws SQLException {
 		int[] updateCounts = null;
 

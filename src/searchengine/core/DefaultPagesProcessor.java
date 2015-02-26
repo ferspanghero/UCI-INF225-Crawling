@@ -127,7 +127,7 @@ public class DefaultPagesProcessor implements IPagesProcessor {
 			
 			while (tokenizer.processNextToken()) {
 				computeWord(config, page, tokenizer.getCurrentToken(), ++wordPagePosition, nGramWordsQueue, pageIndexPostingData);
-			}					
+			}				
 
 			// If the page is not indexed
 			if (!page.getIndexed()) {

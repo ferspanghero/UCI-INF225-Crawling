@@ -43,20 +43,6 @@ public class MySQLPagesRepositoryTest {
 	}
 
 	@Test
-	public void testRetrievePagesCount() throws SQLException {
-		// Arrange
-		int pagesCount;
-
-		// Act
-		repository.insertPages(pages);
-		pagesCount = repository.retrievePagesCount();
-		repository.deletePages(pages);
-
-		// Assert
-		Assert.assertTrue(pagesCount >= 3);
-	}
-
-	@Test
 	public void testInsertPages() throws SQLException {
 		// Arrange
 		int[] result;
