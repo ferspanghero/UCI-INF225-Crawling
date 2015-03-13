@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import searchengine.core.Page;
 
@@ -26,6 +27,7 @@ public class MySQLPagesRepository implements IPagesRepository {
 	// Since the database records are read in chunks (or pages), determines the
 	// current page that will be read
 	private int currentPagesPaginationIndex;
+	private static final int MATCHING_PAGES_LIMIT = 500;
 
 	@Override
 	public void reset() {
@@ -63,6 +65,49 @@ public class MySQLPagesRepository implements IPagesRepository {
 	}
 
 	@Override
+	public List<String> searchPages(Set<String> words) throws SQLException {
+		List<String> pagesUrls = new ArrayList<String>();
+
+		if (words != null && !words.isEmpty()) {
+			try (Connection connection = getConnection()) {
+				// ResultSet.TYPE_SCROLL_SENSITIVE tells the driver to consider altered records since the last page was read
+				// ResultSet.CONCUR_READ_ONLY tells the driver to create a read-only result set
+				try (Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+
+					StringBuilder sqlQueryBuilder = new StringBuilder();
+
+					sqlQueryBuilder.append("select P.URL, SUM(WP.TFIDF) as totalTfidf from wordspages WP inner join pages P on WP.PageId = P.Id where wordId in (select Id from words where Word in (");
+					
+					int i = 0;
+					
+					for (String word : words) {
+						sqlQueryBuilder.append("\"");
+						sqlQueryBuilder.append(word);
+						sqlQueryBuilder.append("\"");
+
+						if (i < words.size() - 1)
+							sqlQueryBuilder.append(",");
+						
+						i++;
+					}
+
+					// Only retrieves matching pages up to a certain limit
+					// TODO: Make the matching pages limit configurable
+					sqlQueryBuilder.append(")) group by WP.PageId order by totalTfidf desc limit 0, " + MATCHING_PAGES_LIMIT);
+
+					try (ResultSet resultSet = statement.executeQuery(sqlQueryBuilder.toString())) {
+						while (resultSet.next()) {
+							pagesUrls.add(resultSet.getString("URL"));
+						}
+					}
+				}
+			}
+		}
+
+		return pagesUrls;
+	}
+
+	@Override
 	public int[] insertPages(List<Page> pages) throws SQLException {
 		int[] updateCounts = null;
 
@@ -79,7 +124,7 @@ public class MySQLPagesRepository implements IPagesRepository {
 					}
 
 					updateCounts = statement.executeBatch();
-					
+
 					// Gets the auto-generated ids from the database and sets to the pages
 					try (ResultSet resultSet = statement.getGeneratedKeys()) {
 						for (Page page : pages) {

@@ -5,7 +5,7 @@ package searchengine.core;
  */
 public class Tokenizer {
 	public Tokenizer(String text) {
-		this.text = text;
+		this.text = text.trim();
 		currentToken = null;
 		textCurrentPosition = 0;
 	}

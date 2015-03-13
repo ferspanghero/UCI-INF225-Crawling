@@ -41,6 +41,11 @@ public class MySQLPagesRepositoryTest {
 		// Assert
 		Assert.assertTrue(retrievedPages != null && retrievedPages.size() == 3);
 	}
+	
+	@Test
+	public void testSearchPages() throws SQLException {
+		// TODO: Not implemented
+	}
 
 	@Test
 	public void testInsertPages() throws SQLException {

@@ -3,7 +3,7 @@
   <display-name>UCI-INF225-Search-Engine</display-name>
   <servlet>
   <servlet-name>SearchEngineServlet</servlet-name>
-  <servlet-class>servlet.SearchEngineServlet</servlet-class>
+  <servlet-class>searchengine.ui.web.SearchEngineServlet</servlet-class>
 </servlet>
 <servlet-mapping>
   <servlet-name>SearchEngineServlet</servlet-name>

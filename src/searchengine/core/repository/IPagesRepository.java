@@ -2,6 +2,7 @@ package searchengine.core.repository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import searchengine.core.Page;
 
@@ -23,6 +24,15 @@ public interface IPagesRepository {
 	 * @throws SQLException
 	 */
 	List<Page> retrieveNextPages(int pagesChunkSize) throws SQLException;
+	
+	/**
+	 * Searches for pages that match a set of words
+	 * 
+	 * @throws SQLException
+	 * 
+	 * @return The URLs of the matching pages
+	 */
+	List<String> searchPages(Set<String> words) throws SQLException;
 		
 	/**
 	 * Inserts pages into the repository
@@ -49,5 +59,5 @@ public interface IPagesRepository {
 	 * 
 	 * @return Values indicating if the operations were performed successfully
 	 */
-	int[] deletePages(List<Page> pages) throws SQLException;
+	int[] deletePages(List<Page> pages) throws SQLException;	
 }
