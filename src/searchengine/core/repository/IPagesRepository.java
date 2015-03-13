@@ -2,7 +2,6 @@ package searchengine.core.repository;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 import searchengine.core.Page;
 
@@ -32,7 +31,7 @@ public interface IPagesRepository {
 	 * 
 	 * @return The URLs of the matching pages
 	 */
-	List<String> searchPages(Set<String> words) throws SQLException;
+	List<String> searchPages(List<String> words) throws SQLException;
 		
 	/**
 	 * Inserts pages into the repository

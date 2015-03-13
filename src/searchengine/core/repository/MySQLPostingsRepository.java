@@ -226,7 +226,7 @@ public class MySQLPostingsRepository implements IPostingsRepository {
 	@Override
 	public void calculatePostingsRankingScore() throws SQLException {
 		try (Connection connection = getConnection()) {
-			try (CallableStatement statement = connection.prepareCall("call calculatePostingsRankingScore")) {
+			try (CallableStatement statement = connection.prepareCall("CALL calculatePostingsRankingScore")) {
 				statement.execute();
 			}
 		}

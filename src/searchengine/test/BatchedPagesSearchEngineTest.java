@@ -2,9 +2,7 @@ package searchengine.test;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,7 +16,7 @@ import searchengine.core.repository.IRepositoriesFactory;
 //TODO: Test edge cases (query is null, etc.)
 public class BatchedPagesSearchEngineTest {
 	private IRepositoriesFactory repositoriesFactory;
-	private Set<String> words;
+	private List<String> words;
 	private List<String> pagesUrls;
 	private static final String SEARCH_QUERY = "search query";
 
@@ -30,7 +28,7 @@ public class BatchedPagesSearchEngineTest {
 		pagesUrls.add("URL1");
 		pagesUrls.add("URL2");
 
-		words = new HashSet<String>();
+		words = new ArrayList<String>();
 
 		words.add("search");
 		words.add("query");

@@ -45,6 +45,7 @@ public class MySQLPagesRepositoryTest {
 	@Test
 	public void testSearchPages() throws SQLException {
 		// TODO: Not implemented
+		Assert.fail();
 	}
 
 	@Test

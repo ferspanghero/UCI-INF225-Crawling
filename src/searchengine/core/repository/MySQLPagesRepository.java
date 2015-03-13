@@ -1,5 +1,6 @@
 package searchengine.core.repository;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import searchengine.core.Page;
 
@@ -65,37 +65,27 @@ public class MySQLPagesRepository implements IPagesRepository {
 	}
 
 	@Override
-	public List<String> searchPages(Set<String> words) throws SQLException {
+	public List<String> searchPages(List<String> words) throws SQLException {
 		List<String> pagesUrls = new ArrayList<String>();
+		String delimiter = ",";
 
 		if (words != null && !words.isEmpty()) {
 			try (Connection connection = getConnection()) {
-				// ResultSet.TYPE_SCROLL_SENSITIVE tells the driver to consider altered records since the last page was read
-				// ResultSet.CONCUR_READ_ONLY tells the driver to create a read-only result set
-				try (Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
-
-					StringBuilder sqlQueryBuilder = new StringBuilder();
-
-					sqlQueryBuilder.append("select P.URL, SUM(WP.TFIDF) as totalTfidf from wordspages WP inner join pages P on WP.PageId = P.Id where wordId in (select Id from words where Word in (");
+				try (CallableStatement statement = connection.prepareCall("CALL searchPages(?, ?, ?)")) {
+					StringBuilder builder = new StringBuilder();
 					
-					int i = 0;
-					
-					for (String word : words) {
-						sqlQueryBuilder.append("\"");
-						sqlQueryBuilder.append(word);
-						sqlQueryBuilder.append("\"");
-
-						if (i < words.size() - 1)
-							sqlQueryBuilder.append(",");
+					for (int i = 0; i < words.size(); i++) {
+						builder.append(words.get(i));
 						
-						i++;
+						if (!(i == words.size() - 1))
+							builder.append(delimiter);
 					}
-
-					// Only retrieves matching pages up to a certain limit
-					// TODO: Make the matching pages limit configurable
-					sqlQueryBuilder.append(")) group by WP.PageId order by totalTfidf desc limit 0, " + MATCHING_PAGES_LIMIT);
-
-					try (ResultSet resultSet = statement.executeQuery(sqlQueryBuilder.toString())) {
+					
+					statement.setString(1, builder.toString());
+					statement.setString(2, delimiter);
+					statement.setInt(3, MATCHING_PAGES_LIMIT);
+					
+					try (ResultSet resultSet = statement.executeQuery()) {
 						while (resultSet.next()) {
 							pagesUrls.add(resultSet.getString("URL"));
 						}

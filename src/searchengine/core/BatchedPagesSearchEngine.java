@@ -1,9 +1,8 @@
 package searchengine.core;
 
 import java.sql.SQLException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import searchengine.core.repository.IRepositoriesFactory;
 
@@ -16,13 +15,13 @@ public class BatchedPagesSearchEngine implements IPagesSearchEngine {
 		setPagesBatchIndex(1);
 
 		pagesUrls = null;
-		lastSearchedWords = new HashSet<String>();
+		lastSearchedWords = new ArrayList<String>();
 	}
 
 	private int pagesPerBatch;
 	private int pagesBatchIndex;	
 	private List<String> pagesUrls;
-	private Set<String> lastSearchedWords;
+	private List<String> lastSearchedWords;
 
 	@Override
 	public List<String> search(IRepositoriesFactory repositoriesFactory, String query) throws ClassNotFoundException, SQLException {
@@ -31,7 +30,7 @@ public class BatchedPagesSearchEngine implements IPagesSearchEngine {
 		if (repositoriesFactory == null)
 			throw new IllegalArgumentException("The search engine cannot be initialized with a null repositories factory");
 
-		Set<String> words = new HashSet<String>(10);
+		List<String> words = new ArrayList<String>(10);
 
 		// TODO: Refactor stop words logic to be inside the Tokenizer so that it can be reused here
 		if (query != null && !query.isEmpty()) {
