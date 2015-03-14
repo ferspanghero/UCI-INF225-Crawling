@@ -2,7 +2,10 @@ package searchengine.core;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import searchengine.core.repository.IRepositoriesFactory;
 
@@ -14,18 +17,21 @@ public class BatchedPagesSearchEngine implements IPagesSearchEngine {
 		setPagesPerBatch(pagesPerBatch);
 		setPagesBatchIndex(1);
 
-		pagesUrls = null;
+		searchedPages = null;
 		lastSearchedWords = new ArrayList<String>();
 	}
 
 	private int pagesPerBatch;
 	private int pagesBatchIndex;	
-	private List<String> pagesUrls;
+	private List<SearchedPage> searchedPages;
 	private List<String> lastSearchedWords;
+	private static final int N_GRAM_MAX_DISTANCE = 3;
+	private static final int N_GRAM_RANKING_SCORE_WEIGHT = 3;
 
 	@Override
-	public List<String> search(IRepositoriesFactory repositoriesFactory, String query) throws ClassNotFoundException, SQLException {
-		List<String> pagesUrlsBatch = null;
+	public List<SearchedPage> search(IRepositoriesFactory repositoriesFactory, String query) throws ClassNotFoundException, SQLException {
+		List<SearchedPage> searchedPagesBatch = null;
+		Map<Integer, List<Integer>> wordsPagesPositions = null;
 
 		if (repositoriesFactory == null)
 			throw new IllegalArgumentException("The search engine cannot be initialized with a null repositories factory");
@@ -42,20 +48,54 @@ public class BatchedPagesSearchEngine implements IPagesSearchEngine {
 
 		if (!words.isEmpty()) {
 			if (!lastSearchedWords.equals(words)) {
-				pagesUrls = repositoriesFactory.getPagesRepository().searchPages(words);
+				searchedPages = repositoriesFactory.getPagesRepository().searchPages(words);
+				wordsPagesPositions = repositoriesFactory.getPostingsRepository().retrieveWordsPagesPositions(words);
+				
+				calculateRankingScoresWithWordPositions(words, wordsPagesPositions);
 
 				lastSearchedWords = words;
 			}		
 		}
 		
-		if (pagesUrls != null) {
+		if (searchedPages != null) {
 			int startIndex = (getPagesBatchIndex() - 1) * getPagesPerBatch();
 			int endIndex = startIndex + getPagesPerBatch();
 
-			pagesUrlsBatch = pagesUrls.subList(startIndex, Math.min(endIndex, pagesUrls.size()));
+			searchedPagesBatch = searchedPages.subList(startIndex, Math.min(endIndex, searchedPages.size()));
 		}
 
-		return pagesUrlsBatch;
+		return searchedPagesBatch;
+	}
+
+	private void calculateRankingScoresWithWordPositions(List<String> words, Map<Integer, List<Integer>> wordsPagesPositions) {
+		// Only considers counting n-grams for queries with more than 1 word
+		if (wordsPagesPositions != null && searchedPages != null && words != null && words.size() > 1) {
+			for (SearchedPage page : searchedPages) {
+				if (wordsPagesPositions.containsKey(page.getPageId())) {
+					List<Integer> wordsPositions = wordsPagesPositions.get(page.getPageId());
+					int nGramCount = 0;
+					
+					if (wordsPositions != null) {
+						for (int i = 0; i < wordsPositions.size() - 1; i++) {
+							// We are arbitrarily assuming that words which are distant over N_GRAM_MAX_DISTANCE positions have nothing to do with each other
+							if (wordsPositions.get(i + 1) - wordsPositions.get(i) <= N_GRAM_MAX_DISTANCE)
+								nGramCount++;
+						}
+					}
+					
+					// Includes the found n-grams count to the ranking score. An arbitrary weight is assigned to the n-grams count
+					page.setRankingScore(page.getRankingScore() + (nGramCount * N_GRAM_RANKING_SCORE_WEIGHT));
+				}
+			}
+												
+			// Sorts again the searched pages list by ranking scores
+			Collections.sort(searchedPages, new Comparator<SearchedPage>() {			
+				@Override
+				public int compare(SearchedPage p1, SearchedPage p2) {
+					return Double.compare(p2.getRankingScore(), p1.getRankingScore());
+				} 
+			});
+		}
 	}
 
 	public int getPagesPerBatch() {
@@ -81,6 +121,6 @@ public class BatchedPagesSearchEngine implements IPagesSearchEngine {
 	}
 	
 	public int getTotalNumberOfPages() {
-		return pagesUrls != null ? pagesUrls.size() : 0;
+		return searchedPages != null ? searchedPages.size() : 0;
 	}
 }

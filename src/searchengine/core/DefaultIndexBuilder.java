@@ -13,6 +13,6 @@ public class DefaultIndexBuilder implements IIndexBuilder {
 		if (repositoriesFactory == null)
 			throw new IllegalArgumentException("The pages processor cannot be initialized with a null repositories factory");
 
-		repositoriesFactory.getPostingsRepository().calculatePostingsRankingScore();
+		repositoriesFactory.getPostingsRepository().buildIndexRankingData();
 	}
 }

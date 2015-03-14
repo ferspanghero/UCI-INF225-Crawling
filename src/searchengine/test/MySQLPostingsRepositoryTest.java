@@ -139,7 +139,7 @@ public class MySQLPostingsRepositoryTest {
 	}
 	
 	@Test
-	public void testCalculateRankingsScore() throws SQLException {
+	public void testBuildIndexRankingData() throws SQLException {
 		// TODO: requires implementation
 		Assert.fail();
 	}

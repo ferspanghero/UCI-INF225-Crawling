@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import searchengine.core.Page;
+import searchengine.core.SearchedPage;
 
 /**
  * Represents a MySql database that contains data about the crawled pages
@@ -65,8 +66,8 @@ public class MySQLPagesRepository implements IPagesRepository {
 	}
 
 	@Override
-	public List<String> searchPages(List<String> words) throws SQLException {
-		List<String> pagesUrls = new ArrayList<String>();
+	public List<SearchedPage> searchPages(List<String> words) throws SQLException {
+		List<SearchedPage> searchedPages = new ArrayList<SearchedPage>();
 		String delimiter = ",";
 
 		if (words != null && !words.isEmpty()) {
@@ -87,14 +88,14 @@ public class MySQLPagesRepository implements IPagesRepository {
 					
 					try (ResultSet resultSet = statement.executeQuery()) {
 						while (resultSet.next()) {
-							pagesUrls.add(resultSet.getString("URL"));
+							searchedPages.add(new SearchedPage(resultSet.getInt(1), resultSet.getString(2), resultSet.getDouble(3)));
 						}
 					}
 				}
 			}
 		}
 
-		return pagesUrls;
+		return searchedPages;
 	}
 
 	@Override

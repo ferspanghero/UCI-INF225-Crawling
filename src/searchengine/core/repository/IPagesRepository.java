@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import searchengine.core.Page;
+import searchengine.core.SearchedPage;
 
 /**
  * Represents a repository that contains data about the crawled pages
@@ -27,11 +28,9 @@ public interface IPagesRepository {
 	/**
 	 * Searches for pages that match a set of words
 	 * 
-	 * @throws SQLException
-	 * 
-	 * @return The URLs of the matching pages
+	 * @throws SQLException	 
 	 */
-	List<String> searchPages(List<String> words) throws SQLException;
+	List<SearchedPage> searchPages(List<String> words) throws SQLException;
 		
 	/**
 	 * Inserts pages into the repository

@@ -24,14 +24,14 @@ public class MySQLPostingsRepository implements IPostingsRepository {
 		Class.forName("com.mysql.jdbc.Driver");
 
 		reset();
-		
+
 		wordsIdsCache = new HashMap<String, Integer>();
 	}
 
 	// Since the database records are read in chunks (or pages), determines the
 	// current posting that will be read
 	private int currentPostingsPaginationIndex;
-	
+
 	// Caches the recently inserted words ids to diminish the number of reads in the database
 	// TODO: this cache is not thread-safe
 	private Map<String, Integer> wordsIdsCache;
@@ -96,7 +96,7 @@ public class MySQLPostingsRepository implements IPostingsRepository {
 
 		if (postings != null) {
 			try (Connection connection = getConnection()) {
-				try {					
+				try {
 					connection.setAutoCommit(false);
 
 					try (PreparedStatement insertWordsPagesPositionsStatement = connection.prepareStatement("INSERT INTO wordspagespositions (WordId, PageId, Position) VALUES (?, ?, ?)")) {
@@ -211,7 +211,7 @@ public class MySQLPostingsRepository implements IPostingsRepository {
 					}
 
 					deleteCountArray = statement.executeBatch();
-					
+
 					// If the delete was successful, removes words ids from the cache
 					for (IndexPosting posting : postings) {
 						wordsIdsCache.remove(posting.getWordId());
@@ -222,20 +222,57 @@ public class MySQLPostingsRepository implements IPostingsRepository {
 
 		return deleteCountArray;
 	}
-	
+
 	@Override
-	public void calculatePostingsRankingScore() throws SQLException {
+	public void buildIndexRankingData() throws SQLException {
 		try (Connection connection = getConnection()) {
-			try (CallableStatement statement = connection.prepareCall("CALL calculatePostingsRankingScore")) {
+			try (CallableStatement statement = connection.prepareCall("CALL buildIndexRankingData")) {
 				statement.execute();
 			}
 		}
 	}
-	
+
+	@Override
+	public Map<Integer, List<Integer>> retrieveWordsPagesPositions(List<String> words) throws SQLException {
+		Map<Integer, List<Integer>> wordsPagesPositions = new HashMap<Integer, List<Integer>>();
+		String delimiter = ",";
+
+		if (words != null && !words.isEmpty()) {
+			try (Connection connection = getConnection()) {
+				try (CallableStatement statement = connection.prepareCall("CALL retrieveWordsPagesPositions(?, ?)")) {
+					StringBuilder builder = new StringBuilder();
+
+					for (int i = 0; i < words.size(); i++) {
+						builder.append(words.get(i));
+
+						if (!(i == words.size() - 1))
+							builder.append(delimiter);
+					}
+
+					statement.setString(1, builder.toString());
+					statement.setString(2, delimiter);
+
+					try (ResultSet resultSet = statement.executeQuery()) {
+						while (resultSet.next()) {
+							int pageId = resultSet.getInt(1);
+
+							if (!wordsPagesPositions.containsKey(pageId))
+								wordsPagesPositions.put(pageId, new ArrayList<Integer>());
+
+							wordsPagesPositions.get(pageId).add(resultSet.getInt(2));
+						}
+					}
+				}
+			}
+		}
+
+		return wordsPagesPositions;
+	}
+
 	private Connection getConnection() throws SQLException {
 		// TODO: make connection parameters configurable
 		// useServerPrepStmts=false tells MySQL to handle server-side prepared statements locally
 		// rewriteBatchedStatements=true tells MySQL to pack as many queries as possible into a single network packet
 		return DriverManager.getConnection("jdbc:mysql://localhost:3306/ucicrawling?user=root&password=password&useServerPrepStmts=false&rewriteBatchedStatements=true&useUnicode=true&characterEncoding=UTF-8");
-	}	
+	}
 }

@@ -2,6 +2,7 @@ package searchengine.core.repository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import searchengine.core.IndexPosting;
 
@@ -49,12 +50,24 @@ public interface IPostingsRepository {
 	 * 
 	 * @return Values indicating if the operations were performed successfully
 	 */
-	int[] deletePostings(List<IndexPosting> postings) throws SQLException;	
-	
+	int[] deletePostings(List<IndexPosting> postings) throws SQLException;
+
 	/**
 	 * Calculates the ranking scores of all index postings
 	 * 
 	 * @throws SQLException
 	 */
-	void calculatePostingsRankingScore() throws SQLException;
+	void buildIndexRankingData() throws SQLException;
+
+	/**
+	 * Retrieves the words pages positions
+	 * 
+	 * @param words
+	 *            the words that should be considered
+	 * 
+	 * @return A map where the key is a page repository id and the value is a sorted word positions collection
+	 * 
+	 * @throws SQLException
+	 */
+	Map<Integer, List<Integer>> retrieveWordsPagesPositions(List<String> words) throws SQLException;
 }

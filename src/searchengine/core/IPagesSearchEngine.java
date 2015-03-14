@@ -16,5 +16,5 @@ public interface IPagesSearchEngine {
 	 * @throws SQLException
 	 * 
 	 */
-	List<String> search(IRepositoriesFactory repositoriesFactory, String query) throws ClassNotFoundException, SQLException;
+	List<SearchedPage> search(IRepositoriesFactory repositoriesFactory, String query) throws ClassNotFoundException, SQLException;
 }

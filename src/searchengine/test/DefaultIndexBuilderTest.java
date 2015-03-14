@@ -30,6 +30,6 @@ public class DefaultIndexBuilderTest {
 		indexBuilder.buildIndex(repositoriesFactory);
 		
 		// Assert		
-		Mockito.verify(repositoriesFactory.getPostingsRepository(), Mockito.times(1)).calculatePostingsRankingScore();
+		Mockito.verify(repositoriesFactory.getPostingsRepository(), Mockito.times(1)).buildIndexRankingData();
 	}
 }

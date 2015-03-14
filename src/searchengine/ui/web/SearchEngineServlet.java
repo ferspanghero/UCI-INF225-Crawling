@@ -2,6 +2,7 @@ package searchengine.ui.web;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import searchengine.core.BatchedPagesSearchEngine;
+import searchengine.core.SearchedPage;
 import searchengine.core.repository.IRepositoriesFactory;
 import searchengine.core.repository.MySQLRepositoriesFactory;
 
@@ -29,7 +31,7 @@ public class SearchEngineServlet extends HttpServlet {
 	 */
 	public SearchEngineServlet() {
 		super();
-		
+
 		searchEngine = new BatchedPagesSearchEngine(RESULTS_PER_PAGE);
 		repositoriesFactory = new MySQLRepositoriesFactory();
 	}
@@ -39,7 +41,7 @@ public class SearchEngineServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html");
-		
+
 		String query = null;
 		int pagesBatchIndex = 1;
 
@@ -51,16 +53,17 @@ public class SearchEngineServlet extends HttpServlet {
 
 		searchEngine.setPagesBatchIndex(pagesBatchIndex);
 
-		List<String> pagesUrls = null;
+		List<SearchedPage> searchedPages = null;
 
 		try {
-			pagesUrls = searchEngine.search(repositoriesFactory, query); // however you get the data*/
+			searchedPages = searchEngine.search(repositoriesFactory, query); // however you get the data*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		int numOfPages = (int) Math.ceil(searchEngine.getTotalNumberOfPages() * 1.0 / RESULTS_PER_PAGE);
 		int listStartNumber = (pagesBatchIndex - 1) * RESULTS_PER_PAGE + 1;
+		List<String> pagesUrls = searchedPages != null ? searchedPages.stream().map(page -> page.getURL()).collect(Collectors.toList()) : null;
 
 		// set the attributes in the request to access it on the JSP
 		request.setAttribute("query", query);
