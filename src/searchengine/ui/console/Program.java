@@ -3,7 +3,9 @@ package searchengine.ui.console;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
@@ -14,6 +16,7 @@ import searchengine.core.DefaultIndexBuilder;
 import searchengine.core.DefaultPagesProcessor;
 import searchengine.core.IIndexBuilder;
 import searchengine.core.IPagesProcessor;
+import searchengine.core.NDGCCalculator;
 import searchengine.core.PagesProcessorConfiguration;
 import searchengine.core.crawling.CrawlParameters;
 import searchengine.core.crawling.Crawler;
@@ -36,6 +39,7 @@ public class Program {
 	private final static String CRAWLING_AGENT_NAME = "UCI WebCrawler 93082117/30489978/12409858";
 	private final static String BASE_DOMAIN = "ics.uci.edu";
 	private final static String BASE_DOMAIN_URL = "http://www." + BASE_DOMAIN;
+	private final static int SEARCH_QUERY_RESULTS_LIMIT = 5;
 
 	public static void main(String[] args) {
 		try {
@@ -140,6 +144,38 @@ public class Program {
 						System.out.println("\nIndex built in " + formattedElapsedTime + "\n");
 						break;
 					}
+					case 9: {
+						List<String> queries = getTestQueries();
+						NDGCCalculator calculator = new NDGCCalculator();
+
+						for (String query : queries) {
+							calculator.calculate(repositoriesFactory, query, SEARCH_QUERY_RESULTS_LIMIT);
+
+							List<String> googleUrls = calculator.getGoogleUrls();
+							List<String> customSearchEngineUrls = calculator.getCustomSearchEngineUrls();
+
+							System.out.println("Query: " + query);
+							System.out.println("\nGoogle results:\n");
+
+							int i = 1;
+
+							for (String googleUrl : googleUrls)
+								System.out.println(i++ + " - " + googleUrl);
+
+							System.out.println("\nCustom search engine results:\n");
+
+							i = 1;
+
+							for (String customSearchEngineUrl : customSearchEngineUrls)
+								System.out.println(i++ + " - " + customSearchEngineUrl);
+
+							System.out.println("\nCustom search engine nDCG@5: " + calculator.getCustomSearchEngineNDCG());
+							
+							System.out.println("\n------------------------------------------------------------\n");
+						}
+						
+						System.out.println("TOTAL ACCUMULATED CUSTOM SEARCH ENGINE NCDG@5: " + calculator.getAccumulatedCustomSearchEngineNDCG() + "\n");
+					}
 					}
 				} while (option != 0);
 			}
@@ -147,7 +183,7 @@ public class Program {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static void printOptions() {
 		System.out.println("(1) - Crawl UCI's domain");
 		System.out.println("(2) - Process crawled pages data");
@@ -156,7 +192,8 @@ public class Program {
 		System.out.println("(5) - Display top " + MOST_FREQUENT_WORDS_COUNT + " most frequent words");
 		System.out.println("(6) - Display top " + MOST_FREQUENT_N_GRAMS_COUNT + " most frequent " + N_GRAM_TYPE + "-grams");
 		System.out.println("(7) - Display subdomains");
-		System.out.println("(8) - Build index");		
+		System.out.println("(8) - Build index");
+		System.out.println("(9) - Calculate nDCG@5 for test queries");
 
 		System.out.println("(0) - Exit");
 	}
@@ -210,5 +247,22 @@ public class Program {
 		processor.processPages(repositoriesFactory, new PagesProcessorConfiguration(stopWords, N_GRAM_TYPE, "ics.uci.edu"));
 
 		return processor;
-	}	
+	}
+
+	private static List<String> getTestQueries() {
+		List<String> queries = new ArrayList<String>();
+
+		queries.add("mondego");
+		queries.add("machine learning");
+		queries.add("software engineering");
+		queries.add("security");
+		queries.add("student affairs");
+		queries.add("graduate courses");
+		queries.add("Crista Lopes");
+		queries.add("REST");
+		queries.add("computer games");
+		queries.add("information retrieval");
+
+		return queries;
+	}
 }

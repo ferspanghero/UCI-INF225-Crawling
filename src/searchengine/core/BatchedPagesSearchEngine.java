@@ -25,8 +25,8 @@ public class BatchedPagesSearchEngine implements IPagesSearchEngine {
 	private int pagesBatchIndex;	
 	private List<SearchedPage> searchedPages;
 	private List<String> lastSearchedWords;
-	private static final int N_GRAM_MAX_DISTANCE = 3;
-	private static final int N_GRAM_RANKING_SCORE_WEIGHT = 3;
+	private static final int N_GRAM_MAX_DISTANCE = 2;
+	private static final int N_GRAM_RANKING_SCORE_WEIGHT = 0;
 
 	@Override
 	public List<SearchedPage> search(IRepositoriesFactory repositoriesFactory, String query) throws ClassNotFoundException, SQLException {
